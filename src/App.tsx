@@ -16,7 +16,7 @@ function App() {
   }, []);
 
   function createMine() {
-    client.models.Mine.create({ content: window.prompt("Mine content") });
+    client.models.Mine.create({ description: window.prompt("Mine description") });
   }
 
     
@@ -36,7 +36,7 @@ function App() {
               <li           
                 onClick={() => deleteMine(mine.id)}
                 key={mine.id}>
-                {mine.content}
+                {mine.description}
               </li>
             ))}
           </ul>

@@ -8,7 +8,7 @@ allows any user authenticated via an API key to "create", "read",
 const schema = a.schema({
   Mine: a
     .model({
-      content: a.string(),
+      description: a.string(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
 });
