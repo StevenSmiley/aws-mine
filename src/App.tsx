@@ -7,21 +7,21 @@ import { generateClient } from "aws-amplify/data";
 const client = generateClient<Schema>();
 
 function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [mines, setMines] = useState<Array<Schema["Mine"]["type"]>>([]);
 
   useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
+    client.models.Mine.observeQuery().subscribe({
+      next: (data) => setMines([...data.items]),
     });
   }, []);
 
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
+  function createMine() {
+    client.models.Mine.create({ content: window.prompt("Mine content") });
   }
 
     
-  function deleteTodo(id: string) {
-    client.models.Todo.delete({ id })
+  function deleteMine(id: string) {
+    client.models.Mine.delete({ id })
   }
 
   return (
@@ -29,19 +29,19 @@ function App() {
     <Authenticator>
       {({ signOut }) => (
         <main>
-          <h1>My todos</h1>
-          <button onClick={createTodo}>+ new</button>
+          <h1>My mines</h1>
+          <button onClick={createMine}>+ new</button>
           <ul>
-            {todos.map((todo) => (
+            {mines.map((mine) => (
               <li           
-                onClick={() => deleteTodo(todo.id)}
-                key={todo.id}>
-                {todo.content}
+                onClick={() => deleteMine(mine.id)}
+                key={mine.id}>
+                {mine.content}
               </li>
             ))}
           </ul>
           <div>
-            🥳 App successfully hosted. Try creating a new todo.
+            🥳 App successfully hosted. Try creating a new mine.
             <br />
             <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
               Review next step of this tutorial.
