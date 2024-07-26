@@ -16,7 +16,7 @@ function App() {
   }, []);
 
   function createMine() {
-    client.models.Mine.create({ description: window.prompt("Mine description"), dateCreated: new Date().toISOString() });
+    client.models.Mine.create({ description: window.prompt("Mine description") });
   }
 
     
@@ -38,7 +38,7 @@ function App() {
                 key={mine.id}>
                 {mine.description}
                 <br />
-                {mine.dateCreated}
+                {mine.createdAt}
               </li>
             ))}
           </ul>

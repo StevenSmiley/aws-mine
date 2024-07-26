@@ -9,7 +9,6 @@ const schema = a.schema({
   Mine: a
     .model({
       description: a.string(),
-      dateCreated: a.datetime(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
 });
