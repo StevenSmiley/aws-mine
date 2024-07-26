@@ -16,7 +16,7 @@ function App() {
   }, []);
 
   function createMine() {
-    client.models.Mine.create({ description: window.prompt("Mine description") });
+    client.models.Mine.create({ description: window.prompt("Mine description"), dateCreated: new Date().toISOString() });
   }
 
     
@@ -29,7 +29,7 @@ function App() {
     <Authenticator>
       {({ signOut }) => (
         <main>
-          <h1>My mines</h1>
+          <h1>AWS mines</h1>
           <button onClick={createMine}>+ new</button>
           <ul>
             {mines.map((mine) => (
@@ -37,17 +37,15 @@ function App() {
                 onClick={() => deleteMine(mine.id)}
                 key={mine.id}>
                 {mine.description}
+                <br />
+                {mine.dateCreated}
               </li>
             ))}
           </ul>
           <div>
-            🥳 App successfully hosted. Try creating a new mine.
             <br />
-            <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-              Review next step of this tutorial.
-            </a>
+            <button onClick={signOut}>Sign out</button>
           </div>
-          <button onClick={signOut}>Sign out</button>
         </main>
       )}
       </Authenticator>
