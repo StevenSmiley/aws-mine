@@ -1,16 +1,21 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import { generateMine } from "../functions/generate-mine/resource"
 
-/*== STEP 1 ===============================================================
-Creates a Mine database table with a "content" field. The authorization rule
-allows any user authenticated via an API key to "create", "read",
-"update", and "delete" any records.
-=========================================================================*/
 const schema = a.schema({
   Mine: a
     .model({
       description: a.string(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
+  AccessKeys: a.customType({
+    accessKeyId: a.string(),
+    secretAccessKey: a.string(),
+  }),
+  GenerateMine: a
+    .query()
+    .arguments({})
+    .returns(a.ref('AccessKeys'))
+    .handler(a.handler.function(generateMine))
 });
 
 export type Schema = ClientSchema<typeof schema>;

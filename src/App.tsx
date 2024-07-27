@@ -35,7 +35,9 @@ function App() {
   }, []);
 
   function createMine() {
-    client.models.Mine.create({ description: window.prompt("Mine description") });
+    client.queries.GenerateMine({}).then((result) => {
+      client.models.Mine.create({ description: result.data?.accessKeyId })
+    });
   }
 
     
