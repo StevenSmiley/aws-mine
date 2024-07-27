@@ -93,7 +93,7 @@ function App() {
                   {
                     type: "link",
                     text: "Documentation",
-                    href: "https://example.com",
+                    href: "https://github.com/StevenSmiley/aws-mine",
                     external: true
                   }
                 ]}
