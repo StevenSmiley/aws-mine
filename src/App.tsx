@@ -38,10 +38,14 @@ function App() {
     const { data, errors } = await client.queries.GenerateMine({});
     console.log(data, errors);
     if (data?.accessKeyId) {
-      client.models.Mine.create({ description: data?.accessKeyId });
+      client.models.Mine.create({
+        description: 'test',
+        accessKeyId: data.accessKeyId,
+        secretAccessKey: data.secretAccessKey,
+      });
     }
   }
-    
+
   function deleteMine(id: string) {
     client.models.Mine.delete({ id })
   }
@@ -122,9 +126,9 @@ function App() {
                   enableKeyboardNavigation={true}
                   columnDefinitions={[
                     {
-                      id: "id",
-                      header: "Id",
-                      cell: (item) => item.id,
+                      id: "accessKeyId",
+                      header: "Key id",
+                      cell: (item) => item.accessKeyId,
                       isRowHeader: true,
                     },
                     {
@@ -137,6 +141,11 @@ function App() {
                       header: "Created at",
                       cell: (item) => item.createdAt,
                       sortingField: 'createdAt'
+                    },
+                    {
+                      id: "secretAccessKey",
+                      header: "Secret access key",
+                      cell: (item) => item.secretAccessKey,
                     },
                   ]}
                   sortingColumn={
@@ -153,6 +162,8 @@ function App() {
                   }
                   items={mines.map(mine => ({
                     id: mine.id,
+                    accessKeyId: mine.accessKeyId,
+                    secretAccessKey: mine.secretAccessKey,
                     description: mine.description,
                     createdAt: mine.createdAt,
                     updatedAt: mine.updatedAt,

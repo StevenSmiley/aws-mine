@@ -4,6 +4,8 @@ import { generateMine } from "../functions/generate-mine/resource"
 const schema = a.schema({
   Mine: a
     .model({
+      accessKeyId: a.string(),
+      secretAccessKey: a.string(),
       description: a.string(),
     })
     .authorization((allow) => [
