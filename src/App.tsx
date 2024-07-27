@@ -8,15 +8,18 @@ import { generateClient } from "aws-amplify/data";
 import {
   AppLayout,
   Badge,
+  Box,
   BreadcrumbGroup,
-  Container,
+  Button,
   ContentLayout,
   // Flashbar,
   Header,
   HelpPanel,
   Link,
   SideNavigation,
+  SpaceBetween,
   // SplitPanel,
+  Table,
   TopNavigation,
 } from '@cloudscape-design/components';
 
@@ -24,7 +27,7 @@ const client = generateClient<Schema>();
 
 function App() {
   const [mines, setMines] = useState<Array<Schema["Mine"]["type"]>>([]);
-
+  const [selectedItems, setSelectedItems] = useState<Array<Schema["Mine"]["type"]>>([]);
   useEffect(() => {
     client.models.Mine.observeQuery().subscribe({
       next: (data) => setMines([...data.items]),
@@ -55,7 +58,7 @@ function App() {
               type: 'button',
               text: 'User Name',
               iconName: 'user-profile',
-              // onClick allows user management
+              // TODO: onClick allows user management
             },
             {
               type: 'button',
@@ -70,7 +73,7 @@ function App() {
               <BreadcrumbGroup
                 items={[
                   { text: 'Home', href: '#' },
-                  { text: 'Service', href: '#' },
+                  { text: 'Mines', href: '#' },
                 ]}
               />
             }
@@ -123,27 +126,70 @@ function App() {
                   </Header>
                 }
               >
-                <Container
+                <Table
+                  enableKeyboardNavigation={true}
+                  columnDefinitions={[
+                    {
+                      id: "id",
+                      header: "Id",
+                      cell: (item) => item.id,
+                      isRowHeader: true,
+                    },
+                    {
+                      id: "description",
+                      header: "Description",
+                      cell: (item) => item.description || "-",
+                    },
+                    {
+                      id: "createdAt",
+                      header: "Created at",
+                      cell: (item) => item.createdAt,
+                      sortingField: 'createdAt'
+                    },
+                  ]}
+                  sortingColumn={
+                    {
+                      sortingField: "createdAt",
+                    }
+                  }
+                  sortingDescending
+                  stickyColumns={
+                    {
+                      first: 1,
+                      last: 1,
+                    }
+                  }
+                  items={mines.map(mine => ({
+                    id: mine.id,
+                    description: mine.description,
+                    createdAt: mine.createdAt,
+                    updatedAt: mine.updatedAt,
+                  }))}
+                  selectedItems={selectedItems}
+                  onSelectionChange={({ detail }) => setSelectedItems(detail.selectedItems)}
+                  empty={<Box margin={{ vertical: 'xs' }} textAlign="center" color="inherit">
+                    <SpaceBetween size="m">
+                      <b>No mines</b>
+                      <Button href='#/create' onClick={createMine}>Create mine</Button>
+                    </SpaceBetween>
+                  </Box>}
+                  selectionType='multi'
+                  variant="full-page"
+                  stickyHeader={true}
+                  resizableColumns={true}
+                  loadingText='Loading mines'
                   header={
-                    <Header variant="h2" description="Table content">
+                    <Header variant="h2" description="Table content" actions={
+                      <SpaceBetween size='xs' direction='horizontal'>
+                        {/* <Button onClick={() => selectedItems.forEach(item => deleteMine(item.id))}>Delete</Button> */}
+                        <Button variant='primary' href='#/create' onClick={createMine}>Create mine</Button>
+                      </SpaceBetween>
+                    }>
                       Table of mines
                     </Header>
                   }
-                >
-                  // TODO: Populate a table
-                  <button onClick={createMine}>+ new</button>
-                  <ul>
-                    {mines.map((mine) => (
-                      <li           
-                        onClick={() => deleteMine(mine.id)}
-                        key={mine.id}>
-                        {mine.description}
-                        <br />
-                        {mine.createdAt}
-                      </li>
-                    ))}
-                  </ul>
-                </Container>
+                  // pagination={<Pagination {...paginationProps} />}
+                />
               </ContentLayout>
             }
           />
