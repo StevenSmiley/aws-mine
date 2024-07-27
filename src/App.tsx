@@ -181,7 +181,7 @@ function App() {
                   header={
                     <Header variant="h2" description="Table content" actions={
                       <SpaceBetween size='xs' direction='horizontal'>
-                        {/* <Button onClick={() => selectedItems.forEach(item => deleteMine(item.id))}>Delete</Button> */}
+                        <Button onClick={() => selectedItems.forEach(item => deleteMine(item.id))}>Delete</Button>
                         <Button variant='primary' href='#/create' onClick={createMine}>Create mine</Button>
                       </SpaceBetween>
                     }>
