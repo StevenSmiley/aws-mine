@@ -114,13 +114,7 @@ function App() {
             toolsOpen={true}
             tools={<HelpPanel header={<h2>Help</h2>}>Help content</HelpPanel>}
             content={
-              <ContentLayout
-                header={
-                  <Header variant="h1" info={<Link variant="info">Info</Link>}>
-                    Mines
-                  </Header>
-                }
-              >
+              <ContentLayout>
                 <Table
                   enableKeyboardNavigation={true}
                   columnDefinitions={[
@@ -174,13 +168,13 @@ function App() {
                   resizableColumns={true}
                   loadingText='Loading mines'
                   header={
-                    <Header variant="h2" description="Table content" actions={
+                    <Header variant="h1" info={<Link variant="info">Info</Link>} actions={
                       <SpaceBetween size='xs' direction='horizontal'>
                         <Button onClick={() => selectedItems.forEach(item => deleteMine(item.id))}>Delete</Button>
                         <Button variant='primary' href='#/create' onClick={createMine}>Create mine</Button>
                       </SpaceBetween>
                     }>
-                      Table of mines
+                      Mines
                     </Header>
                   }
                   // pagination={<Pagination {...paginationProps} />}
