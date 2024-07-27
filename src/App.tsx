@@ -34,11 +34,12 @@ function App() {
     });
   }, []);
 
-  function createMine() {
-    client.queries.GenerateMine({}).then((result) => {
-      console.log(result)
-      client.models.Mine.create({ description: result.data?.accessKeyId })
-    });
+  async function createMine() {
+    const { data, errors } = await client.queries.GenerateMine({});
+    console.log(data, errors);
+    if (data?.accessKeyId) {
+      client.models.Mine.create({ description: data?.accessKeyId });
+    }
   }
     
   function deleteMine(id: string) {
