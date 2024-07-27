@@ -16,6 +16,7 @@ const schema = a.schema({
     .arguments({})
     .returns(a.ref('AccessKeys'))
     .handler(a.handler.function(generateMine))
+    .authorization(allow => [allow.authenticated()])
 });
 
 export type Schema = ClientSchema<typeof schema>;
