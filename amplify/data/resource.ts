@@ -6,7 +6,10 @@ const schema = a.schema({
     .model({
       description: a.string(),
     })
-    .authorization((allow) => [allow.publicApiKey()]),
+    .authorization((allow) => [
+      allow.publicApiKey(),
+      allow.authenticated(),
+    ]),
   AccessKeys: a.customType({
     accessKeyId: a.string(),
     secretAccessKey: a.string(),
@@ -16,7 +19,10 @@ const schema = a.schema({
     .arguments({})
     .returns(a.ref('AccessKeys'))
     .handler(a.handler.function(generateMine))
-    .authorization((allow) => [allow.publicApiKey()])
+    .authorization((allow) => [
+      allow.publicApiKey(),
+      allow.authenticated(),
+    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
