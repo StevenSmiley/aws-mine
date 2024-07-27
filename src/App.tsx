@@ -34,16 +34,12 @@ function App() {
     });
   }, []);
 
-  async function createMine() {
-    const result = await client.queries.GenerateMine({});
-    if (result.data?.accessKeyId) {
-      await client.models.Mine.create({ description: result.data.accessKeyId });
-    } else {
-      console.error('Failed to generate accessKeyId');
-    }
+  function createMine() {
+    client.queries.GenerateMine({}).then((result) => {
+      console.log(result)
+      client.models.Mine.create({ description: result.data?.accessKeyId })
+    });
   }
-
-
     
   function deleteMine(id: string) {
     client.models.Mine.delete({ id })
