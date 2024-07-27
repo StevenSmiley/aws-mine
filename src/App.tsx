@@ -82,12 +82,7 @@ function App() {
               <SideNavigation
                 items={[
                   { type: "link", text: "Mines", href: "#/mines" },
-                  {
-                    type: "link",
-                    text: "Create a mine",
-                    href: "#/create"
-                  },
-                  { type: "link", text: "Other", href: "#/other" },
+                  { type: "link", text: "Integrations", href: "#/integrations" },
                   { type: "divider" },
                   {
                     type: "link",
