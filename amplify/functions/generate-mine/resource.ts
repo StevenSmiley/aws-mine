@@ -1,6 +1,6 @@
 import { defineFunction } from "@aws-amplify/backend";
     
-export const createMine = defineFunction({
-  name: "create-mine",
+export const generateMine = defineFunction({
+  name: "generate-mine",
   entry: "./handler.ts"
 });
