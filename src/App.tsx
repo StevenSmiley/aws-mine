@@ -187,7 +187,7 @@ function App() {
                   resizableColumns={true}
                   loadingText='Loading mines'
                   header={
-                    <Header variant="h1" info={<Link variant="info">Info</Link>} actions={
+                    <Header variant="h1" actions={
                       <SpaceBetween size='xs' direction='horizontal'>
                         <Button onClick={() => selectedItems.forEach(item => deleteMine(item.id))}>Delete</Button>
                         <Button variant='primary' href='#/create' onClick={createMine}>Create mine</Button>
