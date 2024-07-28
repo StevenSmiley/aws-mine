@@ -65,7 +65,7 @@ const deleteQuarantinedUserStatement = new iam.PolicyStatement({
 })
 // Give the disarmMine function permission to delete access keys
 const deleteAccessKeyStatement = new iam.PolicyStatement({
-  sid: "DeleteQuarantinedUser",
+  sid: "DeleteAccessKey",
   effect: iam.Effect.ALLOW,
   actions: ["iam:DeleteAccessKey"],
   resources: ["*"],
