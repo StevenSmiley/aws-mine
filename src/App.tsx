@@ -148,10 +148,10 @@ function App() {
                   enableKeyboardNavigation={true}
                   columnDefinitions={[
                     {
-                      id: "accessKeyId",
-                      header: "Key id",
-                      cell: (item) => item.accessKeyId,
-                      isRowHeader: true,
+                      id: "createdAt",
+                      header: "Created at",
+                      cell: (item) => item.createdAt,
+                      sortingField: 'createdAt'
                     },
                     {
                       id: "description",
@@ -159,15 +159,20 @@ function App() {
                       cell: (item) => item.description || "-",
                     },
                     {
-                      id: "createdAt",
-                      header: "Created at",
-                      cell: (item) => item.createdAt,
-                      sortingField: 'createdAt'
+                      id: "accessKeyId",
+                      header: "Key id",
+                      cell: (item) => item.accessKeyId,
+                      isRowHeader: true,
                     },
                     {
                       id: "secretAccessKey",
                       header: "Secret access key",
                       cell: (item) => item.secretAccessKey,
+                    },
+                    {
+                      id: "username",
+                      header: "Username",
+                      cell: (item) => item.username,
                     },
                   ]}
                   sortingColumn={
@@ -179,7 +184,6 @@ function App() {
                   stickyColumns={
                     {
                     first: 1,
-                    last: 1,
                     }
                   }
                   items={mines.map(mine => ({
