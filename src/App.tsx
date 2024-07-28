@@ -186,6 +186,7 @@ function App() {
                   stickyHeader={true}
                   resizableColumns={true}
                   loadingText='Loading mines'
+                  trackBy={'id'}
                   header={
                     <Header variant="h1" actions={
                       <SpaceBetween size='xs' direction='horizontal'>
