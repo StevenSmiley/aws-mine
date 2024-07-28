@@ -34,9 +34,9 @@ const createQuarantinedAccessKeysStatement = new iam.PolicyStatement({
   sid: "CreateQuarantinedAccessKeys",
   effect: iam.Effect.ALLOW,
   actions: ["iam:CreateAccessKey"],
-  // conditions: [
-  //   { "StringEquals": {"aws:ResourceTag/aws-mine": "quarantined"} }
-  // ],
+  conditions: [
+    { "StringEquals": {"aws:ResourceTag/aws-mine": "quarantined"} }
+  ],
   resources: ["*"],
 })
 
