@@ -3,8 +3,9 @@ import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { generateMine } from './functions/generate-mine/resource';
 
-defineBackend({
+export const backend = defineBackend({
   auth,
   data,
   generateMine,
 });
+
