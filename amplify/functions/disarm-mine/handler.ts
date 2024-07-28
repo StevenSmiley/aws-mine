@@ -19,6 +19,7 @@ export const handler: Schema["DisarmMine"]["functionHandler"] = async (event) =>
   try {
     await iamClient.send(new DeleteAccessKeyCommand({
       AccessKeyId: event.arguments.accessKeyId,
+      UserName: event.arguments.username,
     }));
     await iamClient.send(new DeleteUserCommand({
       UserName: event.arguments.username,
