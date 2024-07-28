@@ -14,6 +14,20 @@ const schema = a.schema({
       allow.publicApiKey(),
       allow.authenticated(),
     ]),
+  TrippedMineEvent: a
+    .model({
+      accessKeyId: a.string(),
+      notified: a.boolean(),
+      eventName: a.string(),
+      eventSource: a.string(),
+      awsRegion: a.string(),
+      userAgent: a.string(),
+      sourceIPAddress: a.string(),
+    })
+    .authorization((allow) => [
+      allow.publicApiKey().to(['read']),
+      allow.authenticated().to(['read']),
+    ]),
   AccessKeys: a.customType({
     username: a.string(),
     accessKeyId: a.string(),
@@ -58,7 +72,3 @@ export const data = defineData({
     },
   },
 });
-
-// Example to fetch records from database
-// const { data: mines } = await client.models.Mine.list()
-// return <ul>{mines.map(mine => <li key={mine.id}>{mine.content}</li>)}</ul>
