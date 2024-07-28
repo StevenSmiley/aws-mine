@@ -1,5 +1,6 @@
 import type { Schema } from "../../data/resource"
 import { IAMClient, CreateUserCommand, CreateAccessKeyCommand } from "@aws-sdk/client-iam";
+import { randomUUID } from 'crypto';
 
 const iamClient = new IAMClient({});
 
@@ -29,7 +30,7 @@ async function createIAMUserAndAccessKeys(username: string) {
 
 export const handler: Schema["GenerateMine"]["functionHandler"] = async (event) => {
   try {
-    const username = `devops-admin-${crypto.randomUUID()}`;
+    const username = `devops-admin-${randomUUID()}`;
     const response = await createIAMUserAndAccessKeys(username);
     console.log(response);
     return response;
