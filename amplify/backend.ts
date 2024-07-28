@@ -22,27 +22,19 @@ const customResourceStack = backend.createStack('AwsMineCustomResources');
 const createQuarantinedUserStatement = new iam.PolicyStatement({
   sid: "CreateQuarantinedUser",
   actions: ["iam:CreateUser"],
-  conditions: [{
-      "StringLike": {
-        "iam:PermissionsBoundary": "arn:aws:iam::aws:policy/AWSCompromisedKeyQuarantineV2"
-      }
-    },
-    {
-      "StringEquals": {
-        "aws:RequestTag/aws-mine": "quarantined"
-      },
-    }],
+  conditions: [
+    { "StringEquals": {"iam:PermissionsBoundary": "arn:aws:iam::aws:policy/AWSCompromisedKeyQuarantineV2"} },
+    { "StringEquals": {"aws:RequestTag/aws-mine": "quarantined"} }
+  ],
   resources: ["*"],
 })
 // Give the generateMine function permission to create access keys for quarantied users only
 const createQuarantinedAccessKeysStatement = new iam.PolicyStatement({
   sid: "CreateQuarantinedAccessKeys",
   actions: ["iam:CreateAccessKeys"],
-  conditions: [{
-    "StringEquals": {
-      "aws:ResourceTag/aws-mine": "quarantined"
-    }
-  }],
+  conditions: [
+    { "StringEquals": {"aws:ResourceTag/aws-mine": "quarantined"} }
+  ],
   resources: ["*"],
 })
 
