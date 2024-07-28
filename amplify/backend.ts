@@ -86,7 +86,7 @@ const logGroup = new logs.LogGroup(customResourceStack, "AwsMineTrailLogGroup", 
 const trail = new cloudtrail.Trail(customResourceStack, "AwsMineTrail", {
   isMultiRegionTrail: false,
   includeGlobalServiceEvents: true,
-  managementEvents: cloudtrail.ReadWriteType.NONE,
+  managementEvents: cloudtrail.ReadWriteType.ALL,
   sendToCloudWatchLogs: true,
   cloudWatchLogGroup: logGroup,
 });
