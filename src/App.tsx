@@ -12,14 +12,17 @@ import {
   BreadcrumbGroup,
   Button,
   ContentLayout,
+  FormField,
   Header,
   HelpPanel,
+  Input,
   Modal,
   SideNavigation,
   SpaceBetween,
   Table,
   TopNavigation,
 } from '@cloudscape-design/components';
+
 
 const client = generateClient<Schema>();
 
@@ -29,6 +32,8 @@ function App() {
   const [navigationOpen, setNavigationOpen] = useState(true);
   const [toolsOpen, setToolsOpen] = useState(true);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [description, setDescription] = useState('');
 
   useEffect(() => {
     client.models.Mine.observeQuery().subscribe({
@@ -36,12 +41,12 @@ function App() {
     });
   }, []);
 
-  async function createMine() {
+  async function createMine(description: string) {
     const { data, errors } = await client.queries.GenerateMine({});
     console.log(data, errors);
     if (data?.accessKeyId) {
       client.models.Mine.create({
-        description: 'test',
+        description: description,
         accessKeyId: data.accessKeyId,
         secretAccessKey: data.secretAccessKey,
       });
@@ -183,7 +188,7 @@ function App() {
                   empty={<Box margin={{ vertical: 'xs' }} textAlign="center" color="inherit">
                       <SpaceBetween size="m">
                         <b>No mines</b>
-                        <Button href='#/create' onClick={createMine}>Create mine</Button>
+                        <Button onClick={() => setIsCreateModalVisible(true)}>Create mine</Button>
                       </SpaceBetween>
                   </Box>}
                   selectionType='multi'
@@ -196,7 +201,7 @@ function App() {
                     <Header variant="h1" actions={
                       <SpaceBetween size='xs' direction='horizontal'>
                         <Button onClick={() => setIsDeleteModalVisible(true)}>Delete</Button>
-                        <Button variant='primary' href='#/create' onClick={createMine}>Create mine</Button>
+                        <Button variant='primary' onClick={() => setIsCreateModalVisible(true)}>Create mine</Button>
                       </SpaceBetween>
                     }>
                       Mines
@@ -207,6 +212,36 @@ function App() {
               </ContentLayout>
             }
           />
+          <Modal
+            onDismiss={() => setIsCreateModalVisible(false)}
+            visible={isCreateModalVisible}
+            closeAriaLabel="Close"
+            header="Create Mine"
+            footer={
+              <Box float="right">
+                <SpaceBetween direction="horizontal" size="xs">
+                  <Button variant="link" onClick={() => setIsCreateModalVisible(false)}>Cancel</Button>
+                  <Button variant="primary" onClick={() => {
+                      createMine(description);
+                      setIsCreateModalVisible(false);
+                      setDescription('');
+                    }}>
+                    Create
+                  </Button>
+                </SpaceBetween>
+              </Box>
+            }
+          >
+            <FormField
+              label="Description"
+              description="Provide a description of where this mine will be placed. This will identify the potentially compromised asset."
+            >
+              <Input 
+                value={description} 
+                onChange={({ detail }) => setDescription(detail.value)}
+              />
+            </FormField>
+          </Modal>
           <Modal
             onDismiss={() => setIsDeleteModalVisible(false)}
             visible={isDeleteModalVisible}
