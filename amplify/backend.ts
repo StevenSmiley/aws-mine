@@ -23,10 +23,17 @@ const createQuarantinedUserStatement = new iam.PolicyStatement({
   sid: "CreateQuarantinedUser",
   effect: iam.Effect.ALLOW,
   actions: ["iam:CreateUser"],
-  // conditions: [
-  //   { "ArnEquals": {"iam:PermissionsBoundary": "arn:aws:iam::aws:policy/AWSCompromisedKeyQuarantineV2"} },
-  //   { "StringEquals": {"aws:RequestTag/aws-mine": "quarantined"} }
-  // ],
+  conditions: [
+    { "ArnEquals": {"iam:PermissionsBoundary": "arn:aws:iam::aws:policy/AWSCompromisedKeyQuarantineV2"} },
+    { "StringEquals": {"aws:RequestTag/aws-mine": "quarantined"} }
+  ],
+  resources: ["*"],
+})
+// Give the generateMine function permission to tag IAM users
+const tagQuarantinedUserStatement = new iam.PolicyStatement({
+  sid: "TagQuarantinedUser",
+  effect: iam.Effect.ALLOW,
+  actions: ["iam:TagUser"],
   resources: ["*"],
 })
 // Give the generateMine function permission to create access keys for quarantied users only
@@ -34,12 +41,13 @@ const createQuarantinedAccessKeysStatement = new iam.PolicyStatement({
   sid: "CreateQuarantinedAccessKeys",
   effect: iam.Effect.ALLOW,
   actions: ["iam:CreateAccessKey"],
-  conditions: [
-    { "StringEquals": {"aws:ResourceTag/aws-mine": "quarantined"} }
-  ],
+  // conditions: [
+  //   { "StringEquals": {"aws:ResourceTag/aws-mine": "quarantined"} }
+  // ],
   resources: ["*"],
 })
 
 const generateMineLambda = backend.generateMine.resources.lambda
 generateMineLambda.addToRolePolicy(createQuarantinedUserStatement)
+generateMineLambda.addToRolePolicy(tagQuarantinedUserStatement)
 generateMineLambda.addToRolePolicy(createQuarantinedAccessKeysStatement)
