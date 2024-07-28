@@ -28,6 +28,9 @@ const client = generateClient<Schema>();
 function App() {
   const [mines, setMines] = useState<Array<Schema["Mine"]["type"]>>([]);
   const [selectedItems, setSelectedItems] = useState<Array<Schema["Mine"]["type"]>>([]);
+  const [navigationOpen, setNavigationOpen] = useState(true);
+  const [toolsOpen, setToolsOpen] = useState(true);
+
   useEffect(() => {
     client.models.Mine.observeQuery().subscribe({
       next: (data) => setMines([...data.items]),
@@ -84,7 +87,9 @@ function App() {
                 ]}
               />
             }
-            navigationOpen={true}
+            navigationOpen={navigationOpen}
+            onNavigationChange={({ detail }) => setNavigationOpen(detail.open)}
+            onToolsChange={({ detail }) => setToolsOpen(detail.open)}
             navigation={
               <SideNavigation
                 items={[
@@ -118,7 +123,7 @@ function App() {
             //     ]}
             //   />
             // }
-            toolsOpen={true}
+            toolsOpen={toolsOpen}
             tools={<HelpPanel header={<h2>Help</h2>}>Help content</HelpPanel>}
             content={
               <ContentLayout>
@@ -198,7 +203,7 @@ function App() {
           />
         </div>
       )}
-      </Authenticator>
+    </Authenticator>
   );
 }
 
