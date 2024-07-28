@@ -31,7 +31,7 @@ const createQuarantinedUserStatement = new iam.PolicyStatement({
 // Give the generateMine function permission to create access keys for quarantied users only
 const createQuarantinedAccessKeysStatement = new iam.PolicyStatement({
   sid: "CreateQuarantinedAccessKeys",
-  actions: ["iam:CreateAccessKeys"],
+  actions: ["iam:CreateAccessKey"],
   conditions: [
     { "StringEquals": {"aws:ResourceTag/aws-mine": "quarantined"} }
   ],
