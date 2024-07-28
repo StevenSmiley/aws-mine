@@ -3,11 +3,13 @@ import * as iam from "aws-cdk-lib/aws-iam"
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { generateMine } from './functions/generate-mine/resource';
+import { disarmMine } from './functions/disarm-mine/resource';
 
 const backend = defineBackend({
   auth,
   data,
   generateMine,
+  disarmMine,
 });
 
 // Disable self sign-up and require users to be added by an admin
@@ -36,7 +38,7 @@ const tagQuarantinedUserStatement = new iam.PolicyStatement({
   actions: ["iam:TagUser"],
   resources: ["*"],
 })
-// Give the generateMine function permission to create access keys for quarantied users only
+// Give the generateMine function permission to create access keys for quarantined users only
 const createQuarantinedAccessKeysStatement = new iam.PolicyStatement({
   sid: "CreateQuarantinedAccessKeys",
   effect: iam.Effect.ALLOW,
@@ -46,8 +48,20 @@ const createQuarantinedAccessKeysStatement = new iam.PolicyStatement({
   },
   resources: ["*"],
 })
-
 const generateMineLambda = backend.generateMine.resources.lambda
 generateMineLambda.addToRolePolicy(createQuarantinedUserStatement)
 generateMineLambda.addToRolePolicy(tagQuarantinedUserStatement)
 generateMineLambda.addToRolePolicy(createQuarantinedAccessKeysStatement)
+
+// Give the disarmMine function permission to delete quarantined users only
+const deleteQuarantinedUserStatement = new iam.PolicyStatement({
+  sid: "DeleteQuarantinedUser",
+  effect: iam.Effect.ALLOW,
+  actions: ["iam:DeleteUser"],
+  conditions: {
+    "StringEquals": {"aws:ResourceTag/aws-mine": "quarantined"} 
+  },
+  resources: ["*"],
+})
+const disarmMineLambda = backend.disarmMine.resources.lambda
+disarmMineLambda.addToRolePolicy(deleteQuarantinedUserStatement)

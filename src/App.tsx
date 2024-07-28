@@ -51,10 +51,16 @@ function App() {
         secretAccessKey: data.secretAccessKey,
       });
     }
+    // TODO: Show errors if there are any
   }
 
-  function deleteMine(id: string) {
-    client.models.Mine.delete({ id });
+  async function deleteMine(id: string) {
+    const { data, errors } = await client.queries.DisarmMine({});
+    console.log(data, errors);
+    if (data?.statusCode == 200) {
+      client.models.Mine.delete({ id });
+    }
+    // TODO: Show errors if there are any
   }
 
   function confirmDelete() {
