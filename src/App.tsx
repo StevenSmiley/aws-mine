@@ -51,7 +51,7 @@ function App() {
   }
 
   return (        
-    <Authenticator>
+    <Authenticator hideSignUp >
       {({ signOut }) => (
         <div>
           <div id="h" style={{ position: 'sticky', top: 0, zIndex: 1002 }}>
