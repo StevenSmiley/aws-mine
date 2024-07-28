@@ -19,6 +19,7 @@ async function createIAMUserAndAccessKeys(username: string) {
     const accessKeyData = await iamClient.send(new CreateAccessKeyCommand(createAccessKeyParams));
 
     return {
+      username: username,
       accessKeyId: accessKeyData.AccessKey?.AccessKeyId,
       secretAccessKey: accessKeyData.AccessKey?.SecretAccessKey,
     };

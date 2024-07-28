@@ -46,6 +46,7 @@ function App() {
     console.log(data, errors);
     if (data?.accessKeyId) {
       client.models.Mine.create({
+        username: data.username,
         description: description,
         accessKeyId: data.accessKeyId,
         secretAccessKey: data.secretAccessKey,
@@ -54,8 +55,8 @@ function App() {
     // TODO: Show errors if there are any
   }
 
-  async function deleteMine(id: string) {
-    const { data, errors } = await client.queries.DisarmMine({});
+  async function deleteMine(id: string, username: string) {
+    const { data, errors } = await client.queries.DisarmMine({ username: username });
     console.log(data, errors);
     if (data?.statusCode == 200) {
       client.models.Mine.delete({ id });
@@ -64,7 +65,7 @@ function App() {
   }
 
   function confirmDelete() {
-    selectedItems.forEach(item => deleteMine(item.id));
+    selectedItems.forEach(item => deleteMine(item.id, item.username!));
     setSelectedItems([]);
     setIsDeleteModalVisible(false);
   }
@@ -183,6 +184,7 @@ function App() {
                   }
                   items={mines.map(mine => ({
                     id: mine.id,
+                    username: mine.username,
                     accessKeyId: mine.accessKeyId,
                     secretAccessKey: mine.secretAccessKey,
                     description: mine.description,

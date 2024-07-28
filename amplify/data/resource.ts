@@ -5,6 +5,7 @@ import { disarmMine } from "../functions/disarm-mine/resource";
 const schema = a.schema({
   Mine: a
     .model({
+      username: a.string(),
       accessKeyId: a.string(),
       secretAccessKey: a.string(),
       description: a.string(),
@@ -14,6 +15,7 @@ const schema = a.schema({
       allow.authenticated(),
     ]),
   AccessKeys: a.customType({
+    username: a.string(),
     accessKeyId: a.string(),
     secretAccessKey: a.string(),
   }),
