@@ -55,8 +55,8 @@ function App() {
     // TODO: Show errors if there are any
   }
 
-  async function deleteMine(id: string, username: string) {
-    const { data, errors } = await client.queries.DisarmMine({ username: username });
+  async function deleteMine(id: string, username: string, accessKeyId: string) {
+    const { data, errors } = await client.queries.DisarmMine({ username: username, accessKeyId: accessKeyId });
     console.log(data, errors);
     if (data?.statusCode == 200) {
       client.models.Mine.delete({ id });
@@ -65,7 +65,7 @@ function App() {
   }
 
   function confirmDelete() {
-    selectedItems.forEach(item => deleteMine(item.id, item.username!));
+    selectedItems.forEach(item => deleteMine(item.id, item.username!, item.accessKeyId!));
     setSelectedItems([]);
     setIsDeleteModalVisible(false);
   }

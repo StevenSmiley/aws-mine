@@ -36,6 +36,7 @@ const schema = a.schema({
     .query()
     .arguments({
       username: a.string(),
+      accessKeyId: a.string(),
     })
     .returns(a.ref('HttpResponse'))
     .handler(a.handler.function(disarmMine))
