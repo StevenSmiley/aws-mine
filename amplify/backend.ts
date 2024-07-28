@@ -1,15 +1,20 @@
 import { defineBackend } from '@aws-amplify/backend';
 import * as iam from "aws-cdk-lib/aws-iam"
+import * as cloudtrail from "aws-cdk-lib/aws-cloudtrail"
+import * as logs from "aws-cdk-lib/aws-logs"
+import * as destinations from 'aws-cdk-lib/aws-logs-destinations';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { generateMine } from './functions/generate-mine/resource';
 import { disarmMine } from './functions/disarm-mine/resource';
+import { trippedMine } from './functions/tripped-mine/resource';
 
 const backend = defineBackend({
   auth,
   data,
   generateMine,
   disarmMine,
+  trippedMine,
 });
 
 // Disable self sign-up and require users to be added by an admin
@@ -17,8 +22,6 @@ const cfnUserPool = backend.auth.resources.cfnResources.cfnUserPool;
 cfnUserPool.adminCreateUserConfig = {
   allowAdminCreateUserOnly: true,
 };
-
-const customResourceStack = backend.createStack('AwsMineCustomResources');
 
 // Give the generateMine function permission to create IAM users
 const createQuarantinedUserStatement = new iam.PolicyStatement({
@@ -73,3 +76,27 @@ const deleteAccessKeyStatement = new iam.PolicyStatement({
 const disarmMineLambda = backend.disarmMine.resources.lambda
 disarmMineLambda.addToRolePolicy(deleteQuarantinedUserStatement)
 disarmMineLambda.addToRolePolicy(deleteAccessKeyStatement)
+
+const customResourceStack = backend.createStack('AwsMineCustomResources');
+
+const logGroup = new logs.LogGroup(customResourceStack, "AwsMineTrailLogGroup", {
+  retention: logs.RetentionDays.ONE_WEEK,
+});
+
+const trail = new cloudtrail.Trail(customResourceStack, "AwsMineTrail", {
+  isMultiRegionTrail: false,
+  includeGlobalServiceEvents: true,
+  managementEvents: cloudtrail.ReadWriteType.NONE,
+  sendToCloudWatchLogs: true,
+  cloudWatchLogGroup: logGroup,
+});
+
+new logs.SubscriptionFilter(customResourceStack, "AwsMineTrailSubscriptionFilter", {
+  logGroup: logGroup,
+  filterPattern: logs.FilterPattern.stringValue(
+    "$.userIdentity.userName",
+    "=",
+    "devops-admin-*",
+  ),
+  destination: new destinations.LambdaDestination(backend.trippedMine.resources.lambda)
+});
