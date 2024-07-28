@@ -32,6 +32,7 @@ const createQuarantinedUserStatement = new iam.PolicyStatement({
         "aws:RequestTag/aws-mine": "quarantined"
       },
     }],
+  resources: ["*"],
 })
 // Give the generateMine function permission to create access keys for quarantied users only
 const createQuarantinedAccessKeysStatement = new iam.PolicyStatement({
