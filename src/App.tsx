@@ -16,6 +16,7 @@ import {
   Header,
   HelpPanel,
   Link,
+  Modal,
   SideNavigation,
   SpaceBetween,
   // SplitPanel,
@@ -30,6 +31,7 @@ function App() {
   const [selectedItems, setSelectedItems] = useState<Array<Schema["Mine"]["type"]>>([]);
   const [navigationOpen, setNavigationOpen] = useState(true);
   const [toolsOpen, setToolsOpen] = useState(true);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   useEffect(() => {
     client.models.Mine.observeQuery().subscribe({
@@ -50,7 +52,13 @@ function App() {
   }
 
   function deleteMine(id: string) {
-    client.models.Mine.delete({ id })
+    client.models.Mine.delete({ id });
+  }
+
+  function confirmDelete() {
+    selectedItems.forEach(item => deleteMine(item.id));
+    setSelectedItems([]);
+    setIsDeleteModalVisible(false);
   }
 
   return (        
@@ -58,27 +66,27 @@ function App() {
       {({ signOut }) => (
         <div>
           <div id="h" style={{ position: 'sticky', top: 0, zIndex: 1002 }}>
-          <TopNavigation
-          identity={{
-            href: '#',
-            title: 'aws-mine',
-          }}
-          utilities={[
-            {
-              type: 'button',
-              text: 'User Name',
-              iconName: 'user-profile',
+            <TopNavigation
+              identity={{
+                href: '#',
+                title: 'aws-mine',
+              }}
+              utilities={[
+                {
+                  type: 'button',
+                  text: 'User Name',
+                  iconName: 'user-profile',
               // TODO: onClick allows user management
-            },
-            {
-              type: 'button',
-              text: 'Sign out',
-              onClick: () => signOut!(),
-            },
-          ]}
-        />
-        </div>
-        <AppLayout
+                },
+                {
+                  type: 'button',
+                  text: 'Sign out',
+                  onClick: () => signOut!(),
+                },
+              ]}
+            />
+          </div>
+          <AppLayout
             breadcrumbs={
               <BreadcrumbGroup
                 items={[
@@ -155,14 +163,14 @@ function App() {
                   ]}
                   sortingColumn={
                     {
-                      sortingField: "createdAt",
+                    sortingField: "createdAt",
                     }
                   }
                   sortingDescending
                   stickyColumns={
                     {
-                      first: 1,
-                      last: 1,
+                    first: 1,
+                    last: 1,
                     }
                   }
                   items={mines.map(mine => ({
@@ -176,10 +184,10 @@ function App() {
                   selectedItems={selectedItems}
                   onSelectionChange={({ detail }) => setSelectedItems(detail.selectedItems)}
                   empty={<Box margin={{ vertical: 'xs' }} textAlign="center" color="inherit">
-                    <SpaceBetween size="m">
-                      <b>No mines</b>
-                      <Button href='#/create' onClick={createMine}>Create mine</Button>
-                    </SpaceBetween>
+                      <SpaceBetween size="m">
+                        <b>No mines</b>
+                        <Button href='#/create' onClick={createMine}>Create mine</Button>
+                      </SpaceBetween>
                   </Box>}
                   selectionType='multi'
                   variant="full-page"
@@ -190,7 +198,7 @@ function App() {
                   header={
                     <Header variant="h1" actions={
                       <SpaceBetween size='xs' direction='horizontal'>
-                        <Button onClick={() => selectedItems.forEach(item => deleteMine(item.id))}>Delete</Button>
+                        <Button onClick={() => setIsDeleteModalVisible(true)}>Delete</Button>
                         <Button variant='primary' href='#/create' onClick={createMine}>Create mine</Button>
                       </SpaceBetween>
                     }>
@@ -202,6 +210,22 @@ function App() {
               </ContentLayout>
             }
           />
+          <Modal
+            onDismiss={() => setIsDeleteModalVisible(false)}
+            visible={isDeleteModalVisible}
+            closeAriaLabel="Close"
+            header="Confirm Deletion"
+            footer={
+              <Box float="right">
+                <SpaceBetween direction="horizontal" size="xs">
+                  <Button variant="link" onClick={() => setIsDeleteModalVisible(false)}>Cancel</Button>
+                  <Button variant="primary" onClick={confirmDelete}>Delete</Button>
+                </SpaceBetween>
+              </Box>
+            }
+          >
+            Are you sure you want to delete the selected mines? This action cannot be undone.
+          </Modal>
         </div>
       )}
     </Authenticator>
