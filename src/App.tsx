@@ -99,26 +99,24 @@ function App() {
     <Authenticator hideSignUp>
       {({ signOut, user }) => (
         <div>
-          <div id="h" style={{ position: "sticky", top: 0, zIndex: 1002 }}>
-            <TopNavigation
-              identity={{
-                href: "#",
-                title: "aws-mine",
-              }}
-              utilities={[
-                {
-                  type: "button",
-                  text: user?.signInDetails?.loginId,
-                  iconName: "user-profile",
-                },
-                {
-                  type: "button",
-                  text: "Sign out",
-                  onClick: () => signOut!(),
-                },
-              ]}
-            />
-          </div>
+          <TopNavigation
+            identity={{
+              href: "#",
+              title: "aws-mine",
+            }}
+            utilities={[
+              {
+                type: "button",
+                text: user?.signInDetails?.loginId,
+                iconName: "user-profile",
+              },
+              {
+                type: "button",
+                text: "Sign out",
+                onClick: () => signOut!(),
+              },
+            ]}
+          />
           <AppLayout
             breadcrumbs={
               <BreadcrumbGroup
