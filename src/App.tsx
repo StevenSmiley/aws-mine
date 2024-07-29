@@ -204,37 +204,48 @@ function App() {
                       cell: (item) => item.description || "-",
                     },
                     {
+                      id: "trippedStatus",
+                      header: "Tripped status",
+                      cell: (item) => (
+                        <SpaceBetween direction="horizontal" size="xs">
+                          <Icon
+                            name={
+                              item.tripped ? "status-warning" : "status-pending"
+                            }
+                            variant={item.tripped ? "error" : "normal"}
+                          />
+                          {item.tripped && item.trippedAt
+                            ? item.trippedAt
+                            : "Not tripped"}
+                        </SpaceBetween>
+                      ),
+                    },
+                    {
                       id: "accessKeyId",
                       header: "Key id",
-                      cell: (item) => item.accessKeyId,
+                      cell: (item) => (
+                        <CopyToClipboard
+                          copyButtonAriaLabel="Copy access key ID"
+                          copyErrorText="Access key ID failed to copy"
+                          copySuccessText="Access key ID copied"
+                          textToCopy={item.accessKeyId}
+                          variant="inline"
+                        />
+                      ),
                       isRowHeader: true,
                     },
                     {
                       id: "secretAccessKey",
                       header: "Secret access key",
-                      cell: (item) => item.secretAccessKey,
-                    },
-                    {
-                      id: "tripped",
-                      header: "Tripped?",
                       cell: (item) => (
-                        <Icon
-                          name={
-                            item.tripped ? "status-warning" : "status-pending"
-                          }
-                          variant={item.tripped ? "error" : "normal"}
+                        <CopyToClipboard
+                          copyButtonAriaLabel="Copy secret access key"
+                          copyErrorText="Secret access key failed to copy"
+                          copySuccessText="Secret access key copied"
+                          textToCopy={item.secretAccessKey!}
+                          variant="inline"
                         />
                       ),
-                    },
-                    {
-                      id: "trippedAt",
-                      header: "Tripped At",
-                      cell: (item) => item.trippedAt || "",
-                    },
-                    {
-                      id: "username",
-                      header: "Username",
-                      cell: (item) => item.username,
                     },
                   ]}
                   sortingColumn={{
