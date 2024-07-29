@@ -5,13 +5,14 @@ import { disarmMine } from "../functions/disarm-mine/resource";
 const schema = a.schema({
   Mine: a
     .model({
-      username: a.string(),
-      accessKeyId: a.string(),
+      accessKeyId: a.string().required(),
       secretAccessKey: a.string(),
+      username: a.string(),
       description: a.string(),
       tripped: a.boolean(),
       trippedAt: a.datetime(),
     })
+    .identifier(["accessKeyId"])
     .authorization((allow) => [allow.publicApiKey(), allow.authenticated()]),
   AccessKeys: a.customType({
     username: a.string(),

@@ -77,21 +77,21 @@ function App() {
     }
   }
 
-  async function deleteMine(id: string, username: string, accessKeyId: string) {
+  async function deleteMine(username: string, accessKeyId: string) {
     const { data, errors } = await client.queries.DisarmMine({
       username: username,
       accessKeyId: accessKeyId,
     });
     console.log(data, errors);
     if (data?.statusCode == 200) {
-      client.models.Mine.delete({ id });
+      client.models.Mine.delete({ accessKeyId });
     }
     // TODO: Show errors if there are any
   }
 
   function confirmDelete() {
     selectedItems.forEach((item) =>
-      deleteMine(item.id, item.username!, item.accessKeyId!)
+      deleteMine(item.accessKeyId, item.username!)
     );
     setSelectedItems([]);
     setIsDeleteModalVisible(false);
@@ -227,7 +227,6 @@ function App() {
                     first: 1,
                   }}
                   items={mines.map((mine) => ({
-                    id: mine.id,
                     username: mine.username,
                     accessKeyId: mine.accessKeyId,
                     secretAccessKey: mine.secretAccessKey,
