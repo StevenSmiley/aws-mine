@@ -70,9 +70,9 @@ function App() {
     setIsDeleteModalVisible(false);
   }
 
-  return (        
+  return (
     <Authenticator hideSignUp >
-      {({ signOut }) => (
+      {({ signOut, user }) => (
         <div>
           <div id="h" style={{ position: 'sticky', top: 0, zIndex: 1002 }}>
             <TopNavigation
@@ -83,7 +83,7 @@ function App() {
               utilities={[
                 {
                   type: 'button',
-                  text: 'User Name',
+                  text: user?.username || 'User Name',
                   iconName: 'user-profile',
               // TODO: onClick allows user management
                 },
