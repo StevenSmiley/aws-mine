@@ -3,6 +3,7 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import * as cloudtrail from "aws-cdk-lib/aws-cloudtrail";
 import * as logs from "aws-cdk-lib/aws-logs";
 import * as destinations from "aws-cdk-lib/aws-logs-destinations";
+import * as sns from "aws-cdk-lib/aws-sns";
 import { auth } from "./auth/resource";
 import { data } from "./data/resource";
 import { generateMine } from "./functions/generate-mine/resource";
@@ -114,31 +115,40 @@ new logs.SubscriptionFilter(
   }
 );
 
-// Allow trippedMineLambda access to the TrippedMineEvent table
-// const trippedMineTable = backend.data.resources.tables['TrippedMineEvent']
-const trippedMineLambda = backend.trippedMine.resources.lambda;
-const putItemsInTrippedMineEventTableStatement = new iam.PolicyStatement({
-  sid: "PutItemsInTrippedMineEventTable",
+const notificationTopic = new sns.Topic(
+  customResourceStack,
+  "AwsMineNotificationTopic",
+  {
+    topicName: "AwsMineNotificationTopic",
+  }
+);
+
+// Allow trippedMineLambda access to DynamoDB
+// const dynamoDBAccessStatement = new iam.PolicyStatement({
+//   sid: "DynamoDBAccess",
+//   effect: iam.Effect.ALLOW,
+//   actions: [
+//     "dynamodb:BatchGetItem",
+//     "dynamodb:BatchWriteItem",
+//     "dynamodb:PutItem",
+//     "dynamodb:DeleteItem",
+//     "dynamodb:GetItem",
+//     "dynamodb:Scan",
+//     "dynamodb:Query",
+//     "dynamodb:UpdateItem",
+//     "dynamodb:ConditionCheckItem",
+//     "dynamodb:DescribeTable",
+//     "dynamodb:GetRecords",
+//     "dynamodb:GetShardIterator",
+//   ],
+//   resources: ["*"],
+// });
+const publishToSNSStatement = new iam.PolicyStatement({
+  sid: "PublishToSNS",
   effect: iam.Effect.ALLOW,
-  actions: [
-    "dynamodb:BatchGetItem",
-    "dynamodb:BatchWriteItem",
-    "dynamodb:PutItem",
-    "dynamodb:DeleteItem",
-    "dynamodb:GetItem",
-    "dynamodb:Scan",
-    "dynamodb:Query",
-    "dynamodb:UpdateItem",
-    "dynamodb:ConditionCheckItem",
-    "dynamodb:DescribeTable",
-    "dynamodb:GetRecords",
-    "dynamodb:GetShardIterator",
-  ],
-  // TODO: Restrict to TrippedMineEvent table
-  // resources: [
-  //   trippedMineTable.tableArn,
-  //   `${trippedMineTable.tableArn}/*`,
-  // ],
-  resources: ["*"],
+  actions: ["sns:Publish"],
+  resources: [notificationTopic.topicArn],
 });
-trippedMineLambda.addToRolePolicy(putItemsInTrippedMineEventTableStatement);
+const trippedMineLambda = backend.trippedMine.resources.lambda;
+// trippedMineLambda.addToRolePolicy(dynamoDBAccessStatement);
+trippedMineLambda.addToRolePolicy(publishToSNSStatement);
