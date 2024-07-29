@@ -3,7 +3,8 @@ import * as logs from "aws-cdk-lib/aws-logs";
 import * as destinations from "aws-cdk-lib/aws-logs-destinations";
 import * as sns from "aws-cdk-lib/aws-sns";
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import { customResourceStack, GRAPHQL_URL, APPSYNC_API_KEY } from "../backend";
+import * as iam from "aws-cdk-lib/aws-iam";
+import { customResourceStack, mineTableArn } from "../backend";
 
 const logGroup = new logs.LogGroup(
   customResourceStack,
@@ -34,15 +35,35 @@ const trippedMineFunction = new lambda.Function(
     handler: "index.handler",
     code: lambda.Code.fromAsset("./tripped-mine"),
     environment: {
-      GRAPHQL_URL: GRAPHQL_URL,
-      APPSYNC_API_KEY: APPSYNC_API_KEY!,
+      MINE_TABLE_ARN: mineTableArn,
       NOTIFICATION_TOPIC_ARN: notificationTopic.topicArn,
     },
   }
 );
 
 notificationTopic.grantPublish(trippedMineFunction);
-// TODO: Give the tripped mine function permission to call the GraphQL API
+
+// Allow trippedMineFunction access to the DynamoDB table
+const readWriteToMineTableStatement = new iam.PolicyStatement({
+  sid: "DynamoDBAccess",
+  effect: iam.Effect.ALLOW,
+  actions: [
+    "dynamodb:BatchGetItem",
+    "dynamodb:BatchWriteItem",
+    "dynamodb:PutItem",
+    "dynamodb:DeleteItem",
+    "dynamodb:GetItem",
+    "dynamodb:Scan",
+    "dynamodb:Query",
+    "dynamodb:UpdateItem",
+    "dynamodb:ConditionCheckItem",
+    "dynamodb:DescribeTable",
+    "dynamodb:GetRecords",
+    "dynamodb:GetShardIterator",
+  ],
+  resources: [mineTableArn, mineTableArn + "/*"],
+});
+trippedMineFunction.addToRolePolicy(readWriteToMineTableStatement);
 
 new logs.SubscriptionFilter(
   customResourceStack,

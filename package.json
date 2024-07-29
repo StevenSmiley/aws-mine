@@ -12,6 +12,7 @@
   "dependencies": {
     "@aws-amplify/ui-react": "^6.1.13",
     "@aws-crypto/sha256-js": "^5.2.0",
+    "@aws-sdk/client-dynamodb": "^3.620.1",
     "@aws-sdk/client-sns": "^3.620.1",
     "@cloudscape-design/components": "^3.0.695",
     "@cloudscape-design/global-styles": "^1.0.31",
