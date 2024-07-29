@@ -34,7 +34,7 @@ async function handleTrippedMine(accessKeyId: string, eventTime: string) {
       snsClient.send(
         new sns.PublishCommand({
           TopicArn: NOTIFICATION_TOPIC_ARN,
-          Message: `Mine with access key ID ${accessKeyId} and description x has been tripped at ${eventTime}.`,
+          Message: `Mine with access key ID ${accessKeyId} and description ${response.Item?.description?.S} has been tripped at ${eventTime}.`,
         })
       );
       // Update the Mine table to set tripped=true and trippedAt=eventTime for the accessKeyId
