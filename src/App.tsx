@@ -36,6 +36,7 @@ function App() {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [description, setDescription] = useState('');
+  const [descriptionError, setDescriptionError] = useState('');
   const [newMine, setNewMine] = useState<Schema["Mine"]["type"] | null>(null);
 
   useEffect(() => {
@@ -255,12 +256,17 @@ function App() {
                 <SpaceBetween direction="horizontal" size="xs">
                   <Button variant="link" onClick={() => setIsCreateModalVisible(false)}>Cancel</Button>
                   <Button variant="primary" onClick={() => {
+                    if (description.trim() === '') {
+                      setDescriptionError('Description cannot be empty');
+                    } else {
                       createMine(description);
                       setIsCreateModalVisible(false);
                       setDescription('');
-                    }}>
+                      setDescriptionError('');
+                    }
+                  }}>
                     Create
-                  </Button>
+                </Button>
                 </SpaceBetween>
               </Box>
             }
@@ -268,12 +274,18 @@ function App() {
             <FormField
               label="Description"
               description="Provide a description of where this mine will be placed. This will identify the potentially compromised asset."
+              errorText={descriptionError}
             >
               <Input 
                 value={description} 
-                onChange={({ detail }) => setDescription(detail.value)}
+                onChange={({ detail }) => {
+                  setDescription(detail.value);
+                  if (detail.value.trim() !== '') {
+                    setDescriptionError('');
+                  }
+                }}
               />
-            </FormField>
+          </FormField>
           </Modal>
           <Modal
             onDismiss={() => setIsDeleteModalVisible(false)}
