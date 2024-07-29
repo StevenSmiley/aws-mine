@@ -15,43 +15,49 @@ const snsClient = new sns.SNSClient();
 const ddbClient = new ddb.DynamoDBClient();
 
 async function handleTrippedMine(accessKeyId: string, eventTime: string) {
-  // Check if mine has already been tripped
-  ddbClient
-    .send(
+  console.log(`Handling tripped mine for accessKeyId: ${accessKeyId}`);
+
+  try {
+    const getItemResponse = await ddbClient.send(
       new ddb.GetItemCommand({
         TableName: MINE_TABLE_ARN,
         Key: {
           accessKeyId: { S: accessKeyId },
         },
       })
-    )
-    .then((response) => {
-      if (response.Item?.tripped?.BOOL) {
-        console.log("Mine has already been tripped");
-        return;
-      }
-      // If that mine wasn't already tripped, publish to the SNS topic and update the table
-      snsClient.send(
-        new sns.PublishCommand({
-          TopicArn: NOTIFICATION_TOPIC_ARN,
-          Message: `Mine with access key ID ${accessKeyId} and description ${response.Item?.description?.S} has been tripped at ${eventTime}.`,
-        })
-      );
-      // Update the Mine table to set tripped=true and trippedAt=eventTime for the accessKeyId
-      ddbClient.send(
-        new ddb.UpdateItemCommand({
-          TableName: MINE_TABLE_ARN,
-          Key: {
-            accessKeyId: { S: accessKeyId },
-          },
-          UpdateExpression: "SET tripped = :tripped, trippedAt = :trippedAt",
-          ExpressionAttributeValues: {
-            ":tripped": { BOOL: true },
-            ":trippedAt": { S: eventTime },
-          },
-        })
-      );
-    });
+    );
+    console.log("GetItem response:", JSON.stringify(getItemResponse, null, 2));
+    if (getItemResponse.Item?.tripped?.BOOL) {
+      console.log("Mine has already been tripped");
+      return;
+    }
+
+    console.log("Publishing to SNS topic");
+    await snsClient.send(
+      new sns.PublishCommand({
+        TopicArn: NOTIFICATION_TOPIC_ARN,
+        Message: `Mine with access key ID ${accessKeyId} and description ${getItemResponse.Item?.description?.S} has been tripped at ${eventTime}.`,
+      })
+    );
+
+    console.log("Updating DynamoDB table");
+    const updateResponse = await ddbClient.send(
+      new ddb.UpdateItemCommand({
+        TableName: MINE_TABLE_ARN,
+        Key: {
+          accessKeyId: { S: accessKeyId },
+        },
+        UpdateExpression: "SET tripped = :tripped, trippedAt = :trippedAt",
+        ExpressionAttributeValues: {
+          ":tripped": { BOOL: true },
+          ":trippedAt": { S: eventTime },
+        },
+      })
+    );
+    console.log("Update response:", JSON.stringify(updateResponse, null, 2));
+  } catch (error) {
+    console.error("Error in handleTrippedMine:", error);
+  }
 }
 
 export const handler = async (event: CloudWatchLogsEvent) => {
