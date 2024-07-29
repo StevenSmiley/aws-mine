@@ -3,14 +3,21 @@ import { promisify } from "util";
 
 const gunzipAsync = promisify(gunzip);
 const AWS_MINE_NOTIFICATION_TOPIC_NAME = "AwsMineNotificationTopic";
+import type {
+  CloudWatchLogsEvent,
+  CloudWatchLogsDecodedData,
+  CloudWatchLogsLogEvent,
+} from "aws-lambda";
 
-export const handler = async (event: any) => {
+export const handler = async (event: CloudWatchLogsEvent) => {
   try {
     const payload = Buffer.from(event.awslogs.data, "base64");
     const decompressed = await gunzipAsync(payload);
-    const result = JSON.parse(decompressed.toString());
+    const result: CloudWatchLogsDecodedData = JSON.parse(
+      decompressed.toString()
+    );
 
-    result.logEvents.forEach((logEvent: { message: string }) => {
+    result.logEvents.forEach((logEvent: CloudWatchLogsLogEvent) => {
       const message = JSON.parse(logEvent.message);
       const interestingFields = {
         accessKeyId: message.userIdentity.accessKeyId,
