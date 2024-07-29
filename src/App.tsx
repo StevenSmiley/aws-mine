@@ -65,18 +65,7 @@ function App() {
           return;
         }
   
-        const newMine = {
-          id: createdMine?.id || '',
-          username: createdMine?.username || '',
-          accessKeyId: createdMine?.accessKeyId || '',
-          secretAccessKey: createdMine?.secretAccessKey || '',
-          description: createdMine?.description || '',
-          createdAt: createdMine?.createdAt || '',
-          updatedAt: createdMine?.updatedAt || '',
-        };
-  
-        setNewMine(newMine);
-        setMines([...mines, newMine]);
+        setNewMine(createdMine);
       }
     } catch (error) {
       console.error('Unexpected error:', error);
