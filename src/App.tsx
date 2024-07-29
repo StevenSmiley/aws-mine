@@ -169,7 +169,23 @@ function App() {
             //   />
             // }
             toolsOpen={toolsOpen}
-            tools={<HelpPanel header={<h2>Help</h2>}>Help content</HelpPanel>}
+            tools={
+              <HelpPanel header={<h2>Help</h2>}>
+                Copy and paste the pair of AWS access keys anywhere you want to
+                tempt bad guys and detect that someone tried to use them.
+                <br />
+                <br />
+                These are normally placed into an AWS credentials file at
+                ~/.aws/credentials on macOS and Linux, or
+                %USERPROFILE%.aws\credentials on Windows.
+                <br />
+                <br />
+                Make sure to provide a helpful description of where they will be
+                placed. If you receive notification that they have been used,
+                you will want to know where they were placed originally so you
+                can determine if that asset has been compromised.
+              </HelpPanel>
+            }
             content={
               <ContentLayout>
                 <Table
