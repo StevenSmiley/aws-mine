@@ -9,6 +9,8 @@ const schema = a.schema({
       accessKeyId: a.string(),
       secretAccessKey: a.string(),
       description: a.string(),
+      tripped: a.boolean(),
+      trippedAt: a.datetime(),
     })
     .authorization((allow) => [allow.publicApiKey(), allow.authenticated()]),
   TrippedMineEvent: a
@@ -16,6 +18,7 @@ const schema = a.schema({
       accessKeyId: a.string(),
       notified: a.boolean(),
       eventName: a.string(),
+      eventTime: a.datetime(),
       eventSource: a.string(),
       awsRegion: a.string(),
       userAgent: a.string(),

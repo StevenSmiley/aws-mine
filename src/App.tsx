@@ -61,6 +61,8 @@ function App() {
             description: description,
             accessKeyId: data.accessKeyId,
             secretAccessKey: data.secretAccessKey,
+            tripped: false,
+            trippedAt: null,
           });
 
         if (createErrors) {
@@ -232,6 +234,8 @@ function App() {
                     description: mine.description,
                     createdAt: mine.createdAt,
                     updatedAt: mine.updatedAt,
+                    tripped: mine.tripped,
+                    trippedAt: mine.trippedAt,
                   }))}
                   selectedItems={selectedItems}
                   onSelectionChange={({ detail }) =>
