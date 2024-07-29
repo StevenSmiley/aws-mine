@@ -1,22 +1,30 @@
-import type { Schema } from "../../data/resource"
-import { IAMClient, CreateUserCommand, CreateAccessKeyCommand } from "@aws-sdk/client-iam";
-import { randomUUID } from 'crypto';
+import type { Schema } from "../../data/resource";
+import {
+  IAMClient,
+  CreateUserCommand,
+  CreateAccessKeyCommand,
+} from "@aws-sdk/client-iam";
+import { randomUUID } from "crypto";
 
 const iamClient = new IAMClient({});
 
 async function createIAMUserAndAccessKeys(username: string) {
   try {
     // Create IAM user
-    await iamClient.send(new CreateUserCommand({
-      UserName: username,
-      PermissionsBoundary: 'arn:aws:iam::aws:policy/AWSCompromisedKeyQuarantineV2',
-      Tags: [{ Key: 'aws-mine', Value: 'quarantined' }]
-    }
-    ));
+    await iamClient.send(
+      new CreateUserCommand({
+        UserName: username,
+        PermissionsBoundary:
+          "arn:aws:iam::aws:policy/AWSCompromisedKeyQuarantineV2",
+        Tags: [{ Key: "aws-mine", Value: "quarantined" }],
+      })
+    );
 
     // Create access keys for the user
     const createAccessKeyParams = { UserName: username };
-    const accessKeyData = await iamClient.send(new CreateAccessKeyCommand(createAccessKeyParams));
+    const accessKeyData = await iamClient.send(
+      new CreateAccessKeyCommand(createAccessKeyParams)
+    );
 
     return {
       username: username,
@@ -29,7 +37,9 @@ async function createIAMUserAndAccessKeys(username: string) {
   }
 }
 
-export const handler: Schema["GenerateMine"]["functionHandler"] = async (event) => {
+export const handler: Schema["GenerateMine"]["functionHandler"] = async (
+  event
+) => {
   try {
     const username = `devops-admin-${randomUUID()}`;
     const response = await createIAMUserAndAccessKeys(username);

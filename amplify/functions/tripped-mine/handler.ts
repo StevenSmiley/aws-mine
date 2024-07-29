@@ -1,11 +1,11 @@
-import { gunzip } from 'zlib';
-import { promisify } from 'util';
+import { gunzip } from "zlib";
+import { promisify } from "util";
 
 const gunzipAsync = promisify(gunzip);
 
 export const handler = async (event: any) => {
   try {
-    const payload = Buffer.from(event.awslogs.data, 'base64');
+    const payload = Buffer.from(event.awslogs.data, "base64");
     const decompressed = await gunzipAsync(payload);
     const result = JSON.parse(decompressed.toString());
 
