@@ -211,7 +211,12 @@ function App() {
                   header={
                     <Header variant="h1" actions={
                       <SpaceBetween size='xs' direction='horizontal'>
-                        <Button onClick={() => setIsDeleteModalVisible(true)}>Delete</Button>
+                        <Button 
+                          onClick={() => selectedItems.length > 0 && setIsDeleteModalVisible(true)}
+                          disabled={selectedItems.length === 0}
+                        >
+                          Delete
+                        </Button>
                         <Button variant='primary' onClick={() => setIsCreateModalVisible(true)}>Create mine</Button>
                       </SpaceBetween>
                     }>
