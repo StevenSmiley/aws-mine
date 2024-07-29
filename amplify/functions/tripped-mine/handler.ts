@@ -29,6 +29,9 @@ export const handler = async (event: CloudWatchLogsEvent) => {
         sourceIPAddress: message.sourceIPAddress,
       };
       console.log("Tripped mine, interesting fields:", interestingFields);
+      // Update the Mine table to set tripped=true and trippedAt=eventTime for the accessKeyId
+
+      // If that mine wasn't already tripped, publish to the SNS topic
     });
   } catch (error) {
     console.error("Error processing event:", error);
