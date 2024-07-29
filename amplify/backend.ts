@@ -12,6 +12,8 @@ const backend = defineBackend({
   disarmMine,
 });
 
+export const APPSYNC_API_ID = backend.data.apiId;
+
 // Disable self sign-up and require users to be added by an admin
 const cfnUserPool = backend.auth.resources.cfnResources.cfnUserPool;
 cfnUserPool.adminCreateUserConfig = {
