@@ -91,8 +91,7 @@ const trail = new cloudtrail.Trail(customResourceStack, "AwsMineTrail", {
   cloudWatchLogGroup: logGroup,
 });
 
-const trippedMineLambda = backend.trippedMine.resources.lambda;
-const trippedMineTable = backend.data.resources.tables['TrippedMineEvent']
+// const trippedMineTable = backend.data.resources.tables['TrippedMineEvent']
 
 new logs.SubscriptionFilter(customResourceStack, "AwsMineTrailSubscriptionFilter", {
   logGroup: logGroup,
@@ -101,14 +100,16 @@ new logs.SubscriptionFilter(customResourceStack, "AwsMineTrailSubscriptionFilter
     "=",
     "devops-admin-*",
   ),
-  destination: new destinations.LambdaDestination(trippedMineLambda)
+  destination: new destinations.LambdaDestination(backend.trippedMine.resources.lambda)
 });
 
 // Allow trippedMineLambda to put items into the TrippedMineEvent table
+const trippedMineLambda = backend.trippedMine.resources.lambda;
 const putItemsInTrippedMineEventTableStatement = new iam.PolicyStatement({
   sid: "PutItemsInTrippedMineEventTable",
   effect: iam.Effect.ALLOW,
   actions: ["dynamodb:PutItem"],
-  resources: [trippedMineTable.tableArn],
+  // resources: [trippedMineTable.tableArn],
+  resources: ["*"],
 })
 trippedMineLambda.addToRolePolicy(putItemsInTrippedMineEventTableStatement)
