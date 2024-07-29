@@ -83,7 +83,7 @@ function App() {
               utilities={[
                 {
                   type: 'button',
-                  text: user?.username || 'User Name',
+                  text: user?.signInDetails?.loginId || 'User Name',
                   iconName: 'user-profile',
               // TODO: onClick allows user management
                 },
