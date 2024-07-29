@@ -16,6 +16,7 @@ import {
   Header,
   HelpPanel,
   Input,
+  Icon,
   Modal,
   SideNavigation,
   SpaceBetween,
@@ -34,6 +35,34 @@ function App() {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [description, setDescription] = useState('');
+  const [newMine, setNewMine] = useState<Schema["Mine"]["type"] | null>(null);
+  const [copyAccessStatus, setcopyAccessStatus] = useState<{ [key: string]: boolean }>({});
+  const [copySecretStatus, setcopySecretStatus] = useState<{ [key: string]: boolean }>({});
+
+
+
+  function copyAccessClipboard(text: string, id: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      setcopyAccessStatus((prevStatus) => ({ ...prevStatus, [id]: true }));
+      setTimeout(() => {
+        setcopyAccessStatus((prevStatus) => ({ ...prevStatus, [id]: false }));
+      }, 2000); // Let's reset the status of the checkmark after 2 seconds.
+    }).catch((err) => {
+      console.error('Failed to copy: ', err);
+    });
+  }
+
+  function copySecretClipboard(text: string, id: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      setcopySecretStatus((prevStatus) => ({ ...prevStatus, [id]: true }));
+      setTimeout(() => {
+        setcopySecretStatus((prevStatus) => ({ ...prevStatus, [id]: false }));
+      }, 2000); // Let's reset the status of the checkmark after 2 seconds.
+    }).catch((err) => {
+      console.error('Failed to copy: ', err);
+    });
+  }
+  
 
   useEffect(() => {
     client.models.Mine.observeQuery().subscribe({
@@ -42,18 +71,47 @@ function App() {
   }, []);
 
   async function createMine(description: string) {
-    const { data, errors } = await client.queries.GenerateMine({});
-    console.log(data, errors);
-    if (data?.accessKeyId) {
-      client.models.Mine.create({
-        username: data.username,
-        description: description,
-        accessKeyId: data.accessKeyId,
-        secretAccessKey: data.secretAccessKey,
-      });
+    try {
+
+      const { data, errors } = await client.queries.GenerateMine({});
+  
+      if (errors) {
+        console.error('Error generating mine:', errors);
+        return;
+      }
+  
+      if (data?.accessKeyId) {
+
+        const { data: createdMine, errors: createErrors } = await client.models.Mine.create({
+          username: data.username,
+          description: description,
+          accessKeyId: data.accessKeyId,
+          secretAccessKey: data.secretAccessKey,
+        });
+  
+        if (createErrors) {
+          console.error('Error creating mine:', createErrors);
+          return;
+        }
+  
+        const newMine = {
+          id: createdMine?.id || '',
+          username: createdMine?.username || '',
+          accessKeyId: createdMine?.accessKeyId || '',
+          secretAccessKey: createdMine?.secretAccessKey || '',
+          description: createdMine?.description || '',
+          createdAt: createdMine?.createdAt || '',
+          updatedAt: createdMine?.updatedAt || '',
+        };
+  
+        setNewMine(newMine);
+        setMines([...mines, newMine]);
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
     }
-    // TODO: Show errors if there are any
   }
+  
 
   async function deleteMine(id: string, username: string, accessKeyId: string) {
     const { data, errors } = await client.queries.DisarmMine({ username: username, accessKeyId: accessKeyId });
@@ -71,7 +129,7 @@ function App() {
   }
 
   return (
-    <Authenticator hideSignUp >
+    <Authenticator hideSignUp>
       {({ signOut, user }) => (
         <div>
           <div id="h" style={{ position: 'sticky', top: 0, zIndex: 1002 }}>
@@ -273,6 +331,46 @@ function App() {
             }
           >
             Are you sure you want to delete the selected mines? This action cannot be undone.
+          </Modal>
+          {/* Overview Modal */}
+          <Modal
+            onDismiss={() => setNewMine(null)}
+            visible={newMine !== null}
+            closeAriaLabel="Close"
+            header="New Mine Overview"
+            footer={
+              <Box float="right">
+                <Button variant="primary" onClick={() => setNewMine(null)}>Close</Button>
+              </Box>
+            }
+          >
+            {newMine && (
+              <div style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '4px', marginTop: '1rem' }}>
+                <p><strong>Description:</strong> {newMine.description}</p>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                  <p style={{ margin: '0', flex: 1 }}><strong>Access Key ID:</strong> {newMine.accessKeyId}</p>
+                  <div style={{ marginLeft: '1rem' }}>
+                    <Button 
+                      onClick={() => copyAccessClipboard(newMine.accessKeyId!, 'accessKeyId')}
+                    >
+                      <Icon name={copyAccessStatus['accessKeyId'] ? "check" : "copy"} />
+                      {copyAccessStatus['accessKeyId'] ? 'Copied!' : ''}
+                    </Button>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <p style={{ margin: '0', flex: 1 }}><strong>Secret Access Key:</strong> {newMine.secretAccessKey}</p>
+                  <div style={{ marginLeft: '1rem' }}>
+                    <Button 
+                      onClick={() => copySecretClipboard(newMine.secretAccessKey!, 'secretAccessKey')}
+                    >
+                      <Icon name={copySecretStatus['secretAccessKey'] ? "check" : "copy"} />
+                      {copySecretStatus['secretAccessKey'] ? 'Copied!' : ''}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </Modal>
         </div>
       )}
