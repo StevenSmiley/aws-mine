@@ -1,4 +1,3 @@
-// import * as React from "react";
 import { Authenticator } from '@aws-amplify/ui-react'
 import '@aws-amplify/ui-react/styles.css'
 import "@cloudscape-design/global-styles/index.css"
@@ -23,7 +22,6 @@ import {
   TopNavigation,
 } from '@cloudscape-design/components';
 
-
 const client = generateClient<Schema>();
 
 function App() {
@@ -34,6 +32,15 @@ function App() {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [description, setDescription] = useState('');
+  const [newMine, setNewMine] = useState<Schema["Mine"]["type"] | null>(null);
+
+  function copyToClipboard(text: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Copied to clipboard!');
+    }).catch((err) => {
+      console.error('Failed to copy: ', err);
+    });
+  }
 
   useEffect(() => {
     client.models.Mine.observeQuery().subscribe({
@@ -42,18 +49,48 @@ function App() {
   }, []);
 
   async function createMine(description: string) {
-    const { data, errors } = await client.queries.GenerateMine({});
-    console.log(data, errors);
-    if (data?.accessKeyId) {
-      client.models.Mine.create({
-        username: data.username,
-        description: description,
-        accessKeyId: data.accessKeyId,
-        secretAccessKey: data.secretAccessKey,
-      });
+    try {
+      // Generate a new mine
+      const { data, errors } = await client.queries.GenerateMine({});
+  
+      if (errors) {
+        console.error('Error generating mine:', errors);
+        return;
+      }
+  
+      if (data?.accessKeyId) {
+        // Create the mine
+        const { data: createdMine, errors: createErrors } = await client.models.Mine.create({
+          username: data.username,
+          description: description,
+          accessKeyId: data.accessKeyId,
+          secretAccessKey: data.secretAccessKey,
+        });
+  
+        if (createErrors) {
+          console.error('Error creating mine:', createErrors);
+          return;
+        }
+  
+        // Define the new mine directly
+        const newMine = {
+          id: createdMine?.id || '',
+          username: createdMine?.username || '',
+          accessKeyId: createdMine?.accessKeyId || '',
+          secretAccessKey: createdMine?.secretAccessKey || '',
+          description: createdMine?.description || '',
+          createdAt: createdMine?.createdAt || '',
+          updatedAt: createdMine?.updatedAt || '',
+        };
+  
+        setNewMine(newMine); // Now this should match the type of newMine state
+        setMines([...mines, newMine]); // Add the new mine to the list
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
     }
-    // TODO: Show errors if there are any
   }
+  
 
   async function deleteMine(id: string, username: string, accessKeyId: string) {
     const { data, errors } = await client.queries.DisarmMine({ username: username, accessKeyId: accessKeyId });
@@ -71,7 +108,7 @@ function App() {
   }
 
   return (
-    <Authenticator hideSignUp >
+    <Authenticator hideSignUp>
       {({ signOut, user }) => (
         <div>
           <div id="h" style={{ position: 'sticky', top: 0, zIndex: 1002 }}>
@@ -127,18 +164,6 @@ function App() {
                 ]}
               />
             }
-            // notifications={
-            //   <Flashbar
-            //     items={[
-            //       {
-            //         type: 'info',
-            //         dismissible: true,
-            //         content: 'This is an info flash message.',
-            //         id: 'message_1',
-            //       },
-            //     ]}
-            //   />
-            // }
             toolsOpen={toolsOpen}
             tools={<HelpPanel header={<h2>Help</h2>}>Help content</HelpPanel>}
             content={
@@ -223,7 +248,6 @@ function App() {
                       Mines
                     </Header>
                   }
-                  // pagination={<Pagination {...paginationProps} />}
                 />
               </ContentLayout>
             }
@@ -273,6 +297,32 @@ function App() {
             }
           >
             Are you sure you want to delete the selected mines? This action cannot be undone.
+          </Modal>
+          {/* Overview Modal */}
+          <Modal
+            onDismiss={() => setNewMine(null)}
+            visible={newMine !== null}
+            closeAriaLabel="Close"
+            header="New Mine Overview"
+            footer={
+              <Box float="right">
+                <Button variant="primary" onClick={() => setNewMine(null)}>Close</Button>
+              </Box>
+            }
+          >
+            {newMine && (
+              <div style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '4px', marginTop: '1rem' }}>
+                <p><strong>Description:</strong> {newMine.description}</p>
+                <p><strong>Access Key ID:</strong> {newMine.accessKeyId} 
+                <Button 
+                  onClick={() => copyToClipboard(newMine.accessKeyId!)}>Copy
+                </Button></p>
+                <p><strong>Secret Access Key:</strong> {newMine.secretAccessKey} 
+                <Button 
+                  onClick={() => copyToClipboard(newMine.secretAccessKey!)}>Copy
+                </Button></p>
+              </div>
+            )}
           </Modal>
         </div>
       )}
