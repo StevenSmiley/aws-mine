@@ -12,7 +12,8 @@ const backend = defineBackend({
   disarmMine,
 });
 
-export const APPSYNC_API_ID = backend.data.apiId;
+export const GRAPHQL_URL = backend.data.graphqlUrl;
+export const APPSYNC_API_KEY = backend.data.apiKey;
 
 // Disable self sign-up and require users to be added by an admin
 const cfnUserPool = backend.auth.resources.cfnResources.cfnUserPool;

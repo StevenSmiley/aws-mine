@@ -3,7 +3,7 @@ import * as logs from "aws-cdk-lib/aws-logs";
 import * as destinations from "aws-cdk-lib/aws-logs-destinations";
 import * as sns from "aws-cdk-lib/aws-sns";
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import { customResourceStack, APPSYNC_API_ID } from "../backend";
+import { customResourceStack, GRAPHQL_URL, APPSYNC_API_KEY } from "../backend";
 
 const logGroup = new logs.LogGroup(
   customResourceStack,
@@ -34,7 +34,8 @@ const trippedMineFunction = new lambda.Function(
     handler: "index.handler",
     code: lambda.Code.fromAsset("./tripped-mine"),
     environment: {
-      APPSYNC_API_ID: APPSYNC_API_ID,
+      GRAPHQL_URL: GRAPHQL_URL,
+      APPSYNC_API_KEY: APPSYNC_API_KEY!,
       NOTIFICATION_TOPIC_ARN: notificationTopic.topicArn,
     },
   }
