@@ -2,6 +2,7 @@ import { gunzip } from "zlib";
 import { promisify } from "util";
 
 const gunzipAsync = promisify(gunzip);
+const AWS_MINE_NOTIFICATION_TOPIC_NAME = "AwsMineNotificationTopic";
 
 export const handler = async (event: any) => {
   try {
@@ -13,13 +14,14 @@ export const handler = async (event: any) => {
       const message = JSON.parse(logEvent.message);
       const interestingFields = {
         accessKeyId: message.userIdentity.accessKeyId,
+        eventTime: message.eventTime,
         eventName: message.eventName,
         eventSource: message.eventSource,
         awsRegion: message.awsRegion,
         userAgent: message.userAgent,
         sourceIPAddress: message.sourceIPAddress,
       };
-      console.log("Interesting fields:", interestingFields);
+      console.log("Tripped mine, interesting fields:", interestingFields);
     });
   } catch (error) {
     console.error("Error processing event:", error);
