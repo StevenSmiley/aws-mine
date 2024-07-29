@@ -103,7 +103,7 @@ new logs.SubscriptionFilter(customResourceStack, "AwsMineTrailSubscriptionFilter
 });
 
 // Allow trippedMineLambda access to the TrippedMineEvent table
-const trippedMineTable = backend.data.resources.tables['TrippedMineEvent']
+// const trippedMineTable = backend.data.resources.tables['TrippedMineEvent']
 const trippedMineLambda = backend.trippedMine.resources.lambda;
 const putItemsInTrippedMineEventTableStatement = new iam.PolicyStatement({
   sid: "PutItemsInTrippedMineEventTable",
@@ -122,9 +122,11 @@ const putItemsInTrippedMineEventTableStatement = new iam.PolicyStatement({
     "dynamodb:GetRecords",
     "dynamodb:GetShardIterator",
   ],
-  resources: [
-    trippedMineTable.tableArn,
-    `${trippedMineTable.tableArn}/*`,
-  ],
+  // TODO: Restrict to TrippedMineEvent table
+  // resources: [
+  //   trippedMineTable.tableArn,
+  //   `${trippedMineTable.tableArn}/*`,
+  // ],
+  resources: ["*"],
 })
 trippedMineLambda.addToRolePolicy(putItemsInTrippedMineEventTableStatement)
