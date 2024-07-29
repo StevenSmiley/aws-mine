@@ -17,6 +17,7 @@ import {
   Header,
   HelpPanel,
   KeyValuePairs,
+  Icon,
   Input,
   Modal,
   SideNavigation,
@@ -212,6 +213,23 @@ function App() {
                       id: "secretAccessKey",
                       header: "Secret access key",
                       cell: (item) => item.secretAccessKey,
+                    },
+                    {
+                      id: "tripped",
+                      header: "Tripped?",
+                      cell: (item) => (
+                        <Icon
+                          name={
+                            item.tripped ? "status-warning" : "status-pending"
+                          }
+                          variant={item.tripped ? "error" : "normal"}
+                        />
+                      ),
+                    },
+                    {
+                      id: "trippedAt",
+                      header: "Tripped At",
+                      cell: (item) => item.trippedAt || "",
                     },
                     {
                       id: "username",
