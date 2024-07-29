@@ -1,3 +1,4 @@
+// import * as React from "react";
 import { Authenticator } from '@aws-amplify/ui-react'
 import '@aws-amplify/ui-react/styles.css'
 import "@cloudscape-design/global-styles/index.css"
@@ -23,8 +24,8 @@ import {
   TopNavigation,
 } from '@cloudscape-design/components';
 
-const client = generateClient<Schema>();
 
+const client = generateClient<Schema>();
 
 function App() {
   const [mines, setMines] = useState<Array<Schema["Mine"]["type"]>>([]);
@@ -104,8 +105,8 @@ function App() {
           updatedAt: createdMine?.updatedAt || '',
         };
   
-        setNewMine(newMine); // Now this should match the type of newMine state
-        setMines([...mines, newMine]); // Add the new mine to the list
+        setNewMine(newMine);
+        setMines([...mines, newMine]);
       }
     } catch (error) {
       console.error('Unexpected error:', error);
@@ -185,6 +186,18 @@ function App() {
                 ]}
               />
             }
+            // notifications={
+            //   <Flashbar
+            //     items={[
+            //       {
+            //         type: 'info',
+            //         dismissible: true,
+            //         content: 'This is an info flash message.',
+            //         id: 'message_1',
+            //       },
+            //     ]}
+            //   />
+            // }
             toolsOpen={toolsOpen}
             tools={<HelpPanel header={<h2>Help</h2>}>Help content</HelpPanel>}
             content={
@@ -365,4 +378,4 @@ function App() {
   );
 }
 
-export default App ;
+export default App;
