@@ -12,11 +12,12 @@ import {
   BreadcrumbGroup,
   Button,
   ContentLayout,
+  CopyToClipboard,
   FormField,
   Header,
   HelpPanel,
+  KeyValuePairs,
   Input,
-  Icon,
   Modal,
   SideNavigation,
   SpaceBetween,
@@ -36,21 +37,6 @@ function App() {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [description, setDescription] = useState('');
   const [newMine, setNewMine] = useState<Schema["Mine"]["type"] | null>(null);
-  const [copyAccessKeyStatus, setCopyAccessKeyStatus] = useState<{ [key: string]: boolean }>({});
-  const [copySecretKeyStatus, setCopySecretKeyStatus] = useState<{ [key: string]: boolean }>({});
-
-  function copyToClipboard(text: string, id: string, setStatus: React.Dispatch<React.SetStateAction<{ [key: string]: boolean }>>) {
-    navigator.clipboard.writeText(text).then(() => {
-      setStatus((prevStatus) => ({ ...prevStatus, [id]: true }));
-      setTimeout(() => {
-        setStatus((prevStatus) => ({ ...prevStatus, [id]: false }));
-      }, 2000);
-    }).catch((err) => {
-      console.error('Failed to copy: ', err);
-    });
-  }
-  const copyAccessKeyToClipboard = (text: string, id: string) => copyToClipboard(text, id, setCopyAccessKeyStatus);
-  const copySecretKeyToClipboard = (text: string, id: string) => copyToClipboard(text, id, setCopySecretKeyStatus);
 
   useEffect(() => {
     client.models.Mine.observeQuery().subscribe({
@@ -328,31 +314,35 @@ function App() {
             }
           >
             {newMine && (
-              <div style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '4px', marginTop: '1rem' }}>
-                <p><strong>Description:</strong> {newMine.description}</p>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                  <p style={{ margin: '0', flex: 1 }}><strong>AWS access key id:</strong> {newMine.accessKeyId}</p>
-                  <div style={{ marginLeft: '1rem' }}>
-                    <Button 
-                      onClick={() => copyAccessKeyToClipboard(newMine.accessKeyId!, 'accessKeyId')}
-                    >
-                      <Icon name={copyAccessKeyStatus['accessKeyId'] ? "check" : "copy"} />
-                      {copyAccessKeyStatus['accessKeyId'] ? 'Copied!' : ''}
-                    </Button>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <p style={{ margin: '0', flex: 1 }}><strong>AWS secret access key:</strong> {newMine.secretAccessKey}</p>
-                  <div style={{ marginLeft: '1rem' }}>
-                    <Button 
-                      onClick={() => copySecretKeyToClipboard(newMine.secretAccessKey!, 'secretAccessKey')}
-                    >
-                      <Icon name={copySecretKeyStatus['secretAccessKey'] ? "check" : "copy"} />
-                      {copySecretKeyStatus['secretAccessKey'] ? 'Copied!' : ''}
-                    </Button>
-                  </div>
-                </div>
-              </div>
+              <KeyValuePairs
+                items={[
+                  { label: "Description", value: newMine.description },
+                  {
+                    label: "AWS access key id",
+                    value: (
+                      <CopyToClipboard
+                        copyButtonAriaLabel="Copy"
+                        copyErrorText="Access key id failed to copy"
+                        copySuccessText="Access key id copied"
+                        textToCopy={newMine.accessKeyId!}
+                        variant="inline"
+                      />
+                    )
+                  },
+                  {
+                    label: "AWS secret access key",
+                    value: (
+                      <CopyToClipboard
+                        copyButtonAriaLabel="Copy"
+                        copyErrorText="Secret access key failed to copy"
+                        copySuccessText="Secret access key copied"
+                        textToCopy={newMine.secretAccessKey!}
+                        variant="inline"
+                      />
+                    )
+                  }
+                ]}
+              />
             )}
           </Modal>
         </div>
