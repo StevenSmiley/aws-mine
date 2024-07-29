@@ -91,7 +91,6 @@ const trail = new cloudtrail.Trail(customResourceStack, "AwsMineTrail", {
   cloudWatchLogGroup: logGroup,
 });
 
-// const trippedMineTable = backend.data.resources.tables['TrippedMineEvent']
 
 new logs.SubscriptionFilter(customResourceStack, "AwsMineTrailSubscriptionFilter", {
   logGroup: logGroup,
@@ -103,13 +102,31 @@ new logs.SubscriptionFilter(customResourceStack, "AwsMineTrailSubscriptionFilter
   destination: new destinations.LambdaDestination(backend.trippedMine.resources.lambda)
 });
 
-// Allow trippedMineLambda to put items into the TrippedMineEvent table
+// Allow trippedMineLambda access to the TrippedMineEvent table
+// const trippedMineTable = backend.data.resources.tables['TrippedMineEvent']
 const trippedMineLambda = backend.trippedMine.resources.lambda;
 const putItemsInTrippedMineEventTableStatement = new iam.PolicyStatement({
   sid: "PutItemsInTrippedMineEventTable",
   effect: iam.Effect.ALLOW,
-  actions: ["dynamodb:PutItem"],
-  // resources: [trippedMineTable.tableArn],
+  actions: [
+    "dynamodb:BatchGetItem",
+    "dynamodb:BatchWriteItem",
+    "dynamodb:PutItem",
+    "dynamodb:DeleteItem",
+    "dynamodb:GetItem",
+    "dynamodb:Scan",
+    "dynamodb:Query",
+    "dynamodb:UpdateItem",
+    "dynamodb:ConditionCheckItem",
+    "dynamodb:DescribeTable",
+    "dynamodb:GetRecords",
+    "dynamodb:GetShardIterator",
+  ],
+  // TODO: Restrict to TrippedMineEvent table
+  // resources: [
+  //   trippedMineTable.tableArn,
+  //   `${trippedMineTable.tableArn}/*`,
+  // ],
   resources: ["*"],
 })
 trippedMineLambda.addToRolePolicy(putItemsInTrippedMineEventTableStatement)
