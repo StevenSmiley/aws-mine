@@ -152,17 +152,17 @@ const publishToSNSStatement = new iam.PolicyStatement({
 });
 const trippedMineLambda = backend.trippedMine.resources.lambda;
 // trippedMineLambda.addToRolePolicy(dynamoDBAccessStatement);
-trippedMineLambda.addToRolePolicy(publishToSNSStatement);
+// trippedMineLambda.addToRolePolicy(publishToSNSStatement);
 const trippedMineLambdaCfn = trippedMineLambda.node.defaultChild as CfnFunction;
-trippedMineLambdaCfn.addPropertyOverride(
-  "Environment.Variables.NOTIFICATION_TOPIC_ARN",
-  notificationTopic.topicArn
-);
-trippedMineLambdaCfn.addPropertyOverride(
-  "Environment.Variables.APPSYNC_API_ID",
-  backend.data.apiId
-);
-backend.data.addLambdaDataSource(
-  "trippedMineLambdaDataSource",
-  trippedMineLambda
-);
+// trippedMineLambdaCfn.addPropertyOverride(
+//   "Environment.Variables.NOTIFICATION_TOPIC_ARN",
+//   notificationTopic.topicArn
+// );
+// trippedMineLambdaCfn.addPropertyOverride(
+//   "Environment.Variables.APPSYNC_API_ID",
+//   backend.data.apiId
+// );
+// backend.data.addLambdaDataSource(
+//   "trippedMineLambdaDataSource",
+//   trippedMineLambda
+// );
