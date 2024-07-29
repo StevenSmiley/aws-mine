@@ -46,7 +46,7 @@ function App() {
       setcopyAccessStatus((prevStatus) => ({ ...prevStatus, [id]: true }));
       setTimeout(() => {
         setcopyAccessStatus((prevStatus) => ({ ...prevStatus, [id]: false }));
-      }, 2000); // Reset status after 2 seconds
+      }, 2000); // Let's reset the status of the checkmark after 2 seconds.
     }).catch((err) => {
       console.error('Failed to copy: ', err);
     });
@@ -57,7 +57,7 @@ function App() {
       setcopySecretStatus((prevStatus) => ({ ...prevStatus, [id]: true }));
       setTimeout(() => {
         setcopySecretStatus((prevStatus) => ({ ...prevStatus, [id]: false }));
-      }, 2000); // Reset status after 2 seconds
+      }, 2000); // Let's reset the status of the checkmark after 2 seconds.
     }).catch((err) => {
       console.error('Failed to copy: ', err);
     });
@@ -72,7 +72,7 @@ function App() {
 
   async function createMine(description: string) {
     try {
-      // Generate a new mine
+
       const { data, errors } = await client.queries.GenerateMine({});
   
       if (errors) {
@@ -81,7 +81,7 @@ function App() {
       }
   
       if (data?.accessKeyId) {
-        // Create the mine
+
         const { data: createdMine, errors: createErrors } = await client.models.Mine.create({
           username: data.username,
           description: description,
@@ -94,7 +94,6 @@ function App() {
           return;
         }
   
-        // Define the new mine directly
         const newMine = {
           id: createdMine?.id || '',
           username: createdMine?.username || '',
@@ -282,6 +281,7 @@ function App() {
                       Mines
                     </Header>
                   }
+                  // pagination={<Pagination {...paginationProps} />}
                 />
               </ContentLayout>
             }
