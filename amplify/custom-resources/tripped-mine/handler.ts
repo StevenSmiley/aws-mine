@@ -2,8 +2,8 @@ import { gunzip } from "zlib";
 import { promisify } from "util";
 
 const gunzipAsync = promisify(gunzip);
-// get this from the environment variable
 const NOTIFICATION_TOPIC_ARN = process.env.NOTIFICATION_TOPIC_ARN;
+const APPSYNC_API_ID = process.env.APPSYNC_API_ID;
 
 import type {
   CloudWatchLogsEvent,
