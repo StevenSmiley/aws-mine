@@ -13,21 +13,6 @@ const schema = a.schema({
       trippedAt: a.datetime(),
     })
     .authorization((allow) => [allow.publicApiKey(), allow.authenticated()]),
-  TrippedMineEvent: a
-    .model({
-      accessKeyId: a.string(),
-      notified: a.boolean(),
-      eventName: a.string(),
-      eventTime: a.datetime(),
-      eventSource: a.string(),
-      awsRegion: a.string(),
-      userAgent: a.string(),
-      sourceIPAddress: a.string(),
-    })
-    .authorization((allow) => [
-      allow.publicApiKey().to(["read"]),
-      allow.authenticated().to(["read"]),
-    ]),
   AccessKeys: a.customType({
     username: a.string(),
     accessKeyId: a.string(),
