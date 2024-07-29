@@ -10,7 +10,7 @@ import * as sns from "@aws-sdk/client-sns";
 
 const gunzipAsync = promisify(gunzip);
 const NOTIFICATION_TOPIC_ARN = process.env.NOTIFICATION_TOPIC_ARN;
-const MINE_TABLE_ARN = process.env.MINE_TABLE_ARN!;
+const MINE_TABLE_NAME = process.env.MINE_TABLE_NAME!;
 const snsClient = new sns.SNSClient();
 const ddbClient = new ddb.DynamoDBClient();
 
@@ -18,10 +18,10 @@ async function handleTrippedMine(accessKeyId: string, eventTime: string) {
   console.log(`Handling tripped mine for accessKeyId: ${accessKeyId}`);
 
   try {
-    console.log(`Querying DDB table ${MINE_TABLE_ARN}`);
+    console.log(`Querying DDB table ${MINE_TABLE_NAME}`);
     const getItemResponse = await ddbClient.send(
       new ddb.GetItemCommand({
-        TableName: MINE_TABLE_ARN,
+        TableName: MINE_TABLE_NAME,
         Key: {
           accessKeyId: { S: accessKeyId },
         },
@@ -50,7 +50,7 @@ async function handleTrippedMine(accessKeyId: string, eventTime: string) {
     console.log("Updating DynamoDB table");
     const updateResponse = await ddbClient.send(
       new ddb.UpdateItemCommand({
-        TableName: MINE_TABLE_ARN,
+        TableName: MINE_TABLE_NAME,
         Key: {
           accessKeyId: { S: accessKeyId },
         },

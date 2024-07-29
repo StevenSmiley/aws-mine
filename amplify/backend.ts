@@ -19,6 +19,7 @@ const backend = defineBackend({
   disarmMine,
 });
 
+const mineTableName = backend.data.resources.tables["Mine"].tableName;
 const mineTableArn = backend.data.resources.tables["Mine"].tableArn;
 
 // Disable self sign-up and require users to be added by an admin
@@ -116,7 +117,7 @@ const trippedMineFunction = new NodejsFunction(
       new URL("./functions/tripped-mine/handler.ts", import.meta.url)
     ),
     environment: {
-      MINE_TABLE_ARN: mineTableArn,
+      MINE_TABLE_NAME: mineTableName,
       NOTIFICATION_TOPIC_ARN: notificationTopic.topicArn,
     },
   }
