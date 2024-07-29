@@ -388,6 +388,31 @@ function App() {
                       />
                     ),
                   },
+                  {
+                    label: "Profile",
+                    value: (
+                      <div>
+                        <Box variant="code">
+                          [devops-admin]
+                          <br />
+                          aws_access_key_id={newMine.accessKeyId}
+                          <br />
+                          aws_secret_access_key={newMine.secretAccessKey}
+                        </Box>
+                        <br />
+                        <CopyToClipboard
+                          copyButtonAriaLabel="Copy"
+                          copyErrorText="Profile failed to copy"
+                          copySuccessText="Profile copied"
+                          textToCopy={`[devops-admin]
+aws_access_key_id = ${newMine.accessKeyId}
+aws_secret_access_key = ${newMine.secretAccessKey}`}
+                          variant="button"
+                          copyButtonText="Copy profile"
+                        />
+                      </div>
+                    ),
+                  },
                 ]}
               />
             )}
