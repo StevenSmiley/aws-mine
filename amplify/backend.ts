@@ -1,3 +1,4 @@
+import * as path from "path";
 import { defineBackend } from "@aws-amplify/backend";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { auth } from "./auth/resource";
@@ -111,7 +112,7 @@ const trippedMineFunction = new NodejsFunction(
   "AwsMineTrippedFunction",
   {
     runtime: lambda.Runtime.NODEJS_18_X,
-    entry: "./functions/tripped-mine/handler.ts",
+    entry: path.join(__dirname, "functions", "tripped-mine", "handler.ts"),
     handler: "handler",
     environment: {
       MINE_TABLE_ARN: mineTableArn,
