@@ -36,33 +36,21 @@ function App() {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [description, setDescription] = useState('');
   const [newMine, setNewMine] = useState<Schema["Mine"]["type"] | null>(null);
-  const [copyAccessStatus, setcopyAccessStatus] = useState<{ [key: string]: boolean }>({});
-  const [copySecretStatus, setcopySecretStatus] = useState<{ [key: string]: boolean }>({});
+  const [copyAccessKeyStatus, setCopyAccessKeyStatus] = useState<{ [key: string]: boolean }>({});
+  const [copySecretKeyStatus, setCopySecretKeyStatus] = useState<{ [key: string]: boolean }>({});
 
-
-
-  function copyAccessClipboard(text: string, id: string) {
+  function copyToClipboard(text: string, id: string, setStatus: React.Dispatch<React.SetStateAction<{ [key: string]: boolean }>>) {
     navigator.clipboard.writeText(text).then(() => {
-      setcopyAccessStatus((prevStatus) => ({ ...prevStatus, [id]: true }));
+      setStatus((prevStatus) => ({ ...prevStatus, [id]: true }));
       setTimeout(() => {
-        setcopyAccessStatus((prevStatus) => ({ ...prevStatus, [id]: false }));
-      }, 2000); // Let's reset the status of the checkmark after 2 seconds.
+        setStatus((prevStatus) => ({ ...prevStatus, [id]: false }));
+      }, 2000);
     }).catch((err) => {
       console.error('Failed to copy: ', err);
     });
   }
-
-  function copySecretClipboard(text: string, id: string) {
-    navigator.clipboard.writeText(text).then(() => {
-      setcopySecretStatus((prevStatus) => ({ ...prevStatus, [id]: true }));
-      setTimeout(() => {
-        setcopySecretStatus((prevStatus) => ({ ...prevStatus, [id]: false }));
-      }, 2000); // Let's reset the status of the checkmark after 2 seconds.
-    }).catch((err) => {
-      console.error('Failed to copy: ', err);
-    });
-  }
-  
+  const copyAccessKeyToClipboard = (text: string, id: string) => copyToClipboard(text, id, setCopyAccessKeyStatus);
+  const copySecretKeyToClipboard = (text: string, id: string) => copyToClipboard(text, id, setCopySecretKeyStatus);
 
   useEffect(() => {
     client.models.Mine.observeQuery().subscribe({
@@ -72,16 +60,13 @@ function App() {
 
   async function createMine(description: string) {
     try {
-
       const { data, errors } = await client.queries.GenerateMine({});
-  
       if (errors) {
         console.error('Error generating mine:', errors);
         return;
       }
   
       if (data?.accessKeyId) {
-
         const { data: createdMine, errors: createErrors } = await client.models.Mine.create({
           username: data.username,
           description: description,
@@ -111,7 +96,6 @@ function App() {
       console.error('Unexpected error:', error);
     }
   }
-  
 
   async function deleteMine(id: string, username: string, accessKeyId: string) {
     const { data, errors } = await client.queries.DisarmMine({ username: username, accessKeyId: accessKeyId });
@@ -332,12 +316,11 @@ function App() {
           >
             Are you sure you want to delete the selected mines? This action cannot be undone.
           </Modal>
-          {/* Overview Modal */}
           <Modal
             onDismiss={() => setNewMine(null)}
             visible={newMine !== null}
             closeAriaLabel="Close"
-            header="New Mine Overview"
+            header="Mine created"
             footer={
               <Box float="right">
                 <Button variant="primary" onClick={() => setNewMine(null)}>Close</Button>
@@ -348,24 +331,24 @@ function App() {
               <div style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '4px', marginTop: '1rem' }}>
                 <p><strong>Description:</strong> {newMine.description}</p>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                  <p style={{ margin: '0', flex: 1 }}><strong>Access Key ID:</strong> {newMine.accessKeyId}</p>
+                  <p style={{ margin: '0', flex: 1 }}><strong>AWS access key id:</strong> {newMine.accessKeyId}</p>
                   <div style={{ marginLeft: '1rem' }}>
                     <Button 
-                      onClick={() => copyAccessClipboard(newMine.accessKeyId!, 'accessKeyId')}
+                      onClick={() => copyAccessKeyToClipboard(newMine.accessKeyId!, 'accessKeyId')}
                     >
-                      <Icon name={copyAccessStatus['accessKeyId'] ? "check" : "copy"} />
-                      {copyAccessStatus['accessKeyId'] ? 'Copied!' : ''}
+                      <Icon name={copyAccessKeyStatus['accessKeyId'] ? "check" : "copy"} />
+                      {copyAccessKeyStatus['accessKeyId'] ? 'Copied!' : ''}
                     </Button>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <p style={{ margin: '0', flex: 1 }}><strong>Secret Access Key:</strong> {newMine.secretAccessKey}</p>
+                  <p style={{ margin: '0', flex: 1 }}><strong>AWS secret access key:</strong> {newMine.secretAccessKey}</p>
                   <div style={{ marginLeft: '1rem' }}>
                     <Button 
-                      onClick={() => copySecretClipboard(newMine.secretAccessKey!, 'secretAccessKey')}
+                      onClick={() => copySecretKeyToClipboard(newMine.secretAccessKey!, 'secretAccessKey')}
                     >
-                      <Icon name={copySecretStatus['secretAccessKey'] ? "check" : "copy"} />
-                      {copySecretStatus['secretAccessKey'] ? 'Copied!' : ''}
+                      <Icon name={copySecretKeyStatus['secretAccessKey'] ? "check" : "copy"} />
+                      {copySecretKeyStatus['secretAccessKey'] ? 'Copied!' : ''}
                     </Button>
                   </div>
                 </div>
