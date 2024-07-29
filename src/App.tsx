@@ -15,6 +15,7 @@ import {
   Header,
   HelpPanel,
   Input,
+  Icon,
   Modal,
   SideNavigation,
   SpaceBetween,
@@ -23,6 +24,7 @@ import {
 } from '@cloudscape-design/components';
 
 const client = generateClient<Schema>();
+
 
 function App() {
   const [mines, setMines] = useState<Array<Schema["Mine"]["type"]>>([]);
@@ -33,14 +35,33 @@ function App() {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [description, setDescription] = useState('');
   const [newMine, setNewMine] = useState<Schema["Mine"]["type"] | null>(null);
+  const [copyAccessStatus, setcopyAccessStatus] = useState<{ [key: string]: boolean }>({});
+  const [copySecretStatus, setcopySecretStatus] = useState<{ [key: string]: boolean }>({});
 
-  function copyToClipboard(text: string) {
+
+
+  function copyAccessClipboard(text: string, id: string) {
     navigator.clipboard.writeText(text).then(() => {
-      alert('Copied to clipboard!');
+      setcopyAccessStatus((prevStatus) => ({ ...prevStatus, [id]: true }));
+      setTimeout(() => {
+        setcopyAccessStatus((prevStatus) => ({ ...prevStatus, [id]: false }));
+      }, 2000); // Reset status after 2 seconds
     }).catch((err) => {
       console.error('Failed to copy: ', err);
     });
   }
+
+  function copySecretClipboard(text: string, id: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      setcopySecretStatus((prevStatus) => ({ ...prevStatus, [id]: true }));
+      setTimeout(() => {
+        setcopySecretStatus((prevStatus) => ({ ...prevStatus, [id]: false }));
+      }, 2000); // Reset status after 2 seconds
+    }).catch((err) => {
+      console.error('Failed to copy: ', err);
+    });
+  }
+  
 
   useEffect(() => {
     client.models.Mine.observeQuery().subscribe({
@@ -313,14 +334,28 @@ function App() {
             {newMine && (
               <div style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '4px', marginTop: '1rem' }}>
                 <p><strong>Description:</strong> {newMine.description}</p>
-                <p><strong>Access Key ID:</strong> {newMine.accessKeyId} 
-                <Button 
-                  onClick={() => copyToClipboard(newMine.accessKeyId!)}>Copy
-                </Button></p>
-                <p><strong>Secret Access Key:</strong> {newMine.secretAccessKey} 
-                <Button 
-                  onClick={() => copyToClipboard(newMine.secretAccessKey!)}>Copy
-                </Button></p>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                  <p style={{ margin: '0', flex: 1 }}><strong>Access Key ID:</strong> {newMine.accessKeyId}</p>
+                  <div style={{ marginLeft: '1rem' }}>
+                    <Button 
+                      onClick={() => copyAccessClipboard(newMine.accessKeyId!, 'accessKeyId')}
+                    >
+                      <Icon name={copyAccessStatus['accessKeyId'] ? "check" : "copy"} />
+                      {copyAccessStatus['accessKeyId'] ? 'Copied!' : ''}
+                    </Button>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <p style={{ margin: '0', flex: 1 }}><strong>Secret Access Key:</strong> {newMine.secretAccessKey}</p>
+                  <div style={{ marginLeft: '1rem' }}>
+                    <Button 
+                      onClick={() => copySecretClipboard(newMine.secretAccessKey!, 'secretAccessKey')}
+                    >
+                      <Icon name={copySecretStatus['secretAccessKey'] ? "check" : "copy"} />
+                      {copySecretStatus['secretAccessKey'] ? 'Copied!' : ''}
+                    </Button>
+                  </div>
+                </div>
               </div>
             )}
           </Modal>
@@ -330,4 +365,4 @@ function App() {
   );
 }
 
-export default App;
+export default App ;
