@@ -9,6 +9,7 @@ import * as logs from "aws-cdk-lib/aws-logs";
 import * as destinations from "aws-cdk-lib/aws-logs-destinations";
 import * as sns from "aws-cdk-lib/aws-sns";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 
 const backend = defineBackend({
   auth,
@@ -105,13 +106,13 @@ const notificationTopic = new sns.Topic(
   "AwsMineNotificationTopic"
 );
 
-const trippedMineFunction = new lambda.Function(
+const trippedMineFunction = new NodejsFunction(
   customResourceStack,
   "AwsMineTrippedFunction",
   {
     runtime: lambda.Runtime.NODEJS_18_X,
-    handler: "index.handler",
-    code: lambda.Code.fromAsset("./functions/tripped-mine"),
+    entry: "./functions/tripped-mine/handler.ts",
+    handler: "handler",
     environment: {
       MINE_TABLE_ARN: mineTableArn,
       NOTIFICATION_TOPIC_ARN: notificationTopic.topicArn,
