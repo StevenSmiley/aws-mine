@@ -18,6 +18,7 @@ async function handleTrippedMine(accessKeyId: string, eventTime: string) {
   console.log(`Handling tripped mine for accessKeyId: ${accessKeyId}`);
 
   try {
+    console.log(`Querying DDB table ${MINE_TABLE_ARN}`);
     const getItemResponse = await ddbClient.send(
       new ddb.GetItemCommand({
         TableName: MINE_TABLE_ARN,
@@ -25,6 +26,11 @@ async function handleTrippedMine(accessKeyId: string, eventTime: string) {
           accessKeyId: { S: accessKeyId },
         },
       })
+    );
+    console.log("DDB query completed");
+    console.log(
+      "Description:",
+      JSON.stringify(getItemResponse.Item?.description?.S, null, 2)
     );
     console.log("GetItem response:", JSON.stringify(getItemResponse, null, 2));
     if (getItemResponse.Item?.tripped?.BOOL) {
@@ -39,6 +45,7 @@ async function handleTrippedMine(accessKeyId: string, eventTime: string) {
         Message: `Mine with access key ID ${accessKeyId} and description ${getItemResponse.Item?.description?.S} has been tripped at ${eventTime}.`,
       })
     );
+    console.log("SNS publish completed");
 
     console.log("Updating DynamoDB table");
     const updateResponse = await ddbClient.send(
