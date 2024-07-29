@@ -2,7 +2,9 @@ import { gunzip } from "zlib";
 import { promisify } from "util";
 
 const gunzipAsync = promisify(gunzip);
-const AWS_MINE_NOTIFICATION_TOPIC_NAME = "AwsMineNotificationTopic";
+// get this from the environment variable
+const NOTIFICATION_TOPIC_ARN = process.env.NOTIFICATION_TOPIC_ARN;
+
 import type {
   CloudWatchLogsEvent,
   CloudWatchLogsDecodedData,

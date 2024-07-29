@@ -1,22 +1,15 @@
 import { defineBackend } from "@aws-amplify/backend";
 import * as iam from "aws-cdk-lib/aws-iam";
-import * as cloudtrail from "aws-cdk-lib/aws-cloudtrail";
-import * as logs from "aws-cdk-lib/aws-logs";
-import * as destinations from "aws-cdk-lib/aws-logs-destinations";
-import * as sns from "aws-cdk-lib/aws-sns";
 import { auth } from "./auth/resource";
 import { data } from "./data/resource";
 import { generateMine } from "./functions/generate-mine/resource";
 import { disarmMine } from "./functions/disarm-mine/resource";
-import { trippedMine } from "./functions/tripped-mine/resource";
-import { CfnFunction } from "aws-cdk-lib/aws-lambda";
 
 const backend = defineBackend({
   auth,
   data,
   generateMine,
   disarmMine,
-  trippedMine,
 });
 
 // Disable self sign-up and require users to be added by an admin
@@ -82,87 +75,6 @@ const disarmMineLambda = backend.disarmMine.resources.lambda;
 disarmMineLambda.addToRolePolicy(deleteQuarantinedUserStatement);
 disarmMineLambda.addToRolePolicy(deleteAccessKeyStatement);
 
-const customResourceStack = backend.createStack("AwsMineCustomResources");
-
-const logGroup = new logs.LogGroup(
-  customResourceStack,
-  "AwsMineTrailLogGroup",
-  {
-    retention: logs.RetentionDays.ONE_WEEK,
-  }
+export const customResourceStack = backend.createStack(
+  "AwsMineCustomResources"
 );
-
-const trail = new cloudtrail.Trail(customResourceStack, "AwsMineTrail", {
-  isMultiRegionTrail: true,
-  includeGlobalServiceEvents: true,
-  managementEvents: cloudtrail.ReadWriteType.ALL,
-  sendToCloudWatchLogs: true,
-  cloudWatchLogGroup: logGroup,
-});
-
-new logs.SubscriptionFilter(
-  customResourceStack,
-  "AwsMineTrailSubscriptionFilter",
-  {
-    logGroup: logGroup,
-    filterPattern: logs.FilterPattern.stringValue(
-      "$.userIdentity.userName",
-      "=",
-      "devops-admin-*"
-    ),
-    destination: new destinations.LambdaDestination(
-      backend.trippedMine.resources.lambda
-    ),
-  }
-);
-
-const notificationTopic = new sns.Topic(
-  customResourceStack,
-  "AwsMineNotificationTopic",
-  {
-    topicName: "AwsMineNotificationTopic",
-  }
-);
-
-// Allow trippedMineLambda access to DynamoDB
-// const dynamoDBAccessStatement = new iam.PolicyStatement({
-//   sid: "DynamoDBAccess",
-//   effect: iam.Effect.ALLOW,
-//   actions: [
-//     "dynamodb:BatchGetItem",
-//     "dynamodb:BatchWriteItem",
-//     "dynamodb:PutItem",
-//     "dynamodb:DeleteItem",
-//     "dynamodb:GetItem",
-//     "dynamodb:Scan",
-//     "dynamodb:Query",
-//     "dynamodb:UpdateItem",
-//     "dynamodb:ConditionCheckItem",
-//     "dynamodb:DescribeTable",
-//     "dynamodb:GetRecords",
-//     "dynamodb:GetShardIterator",
-//   ],
-//   resources: ["*"],
-// });
-const publishToSNSStatement = new iam.PolicyStatement({
-  sid: "PublishToSNS",
-  effect: iam.Effect.ALLOW,
-  actions: ["sns:Publish"],
-  resources: [notificationTopic.topicArn],
-});
-const trippedMineLambda = backend.trippedMine.resources.lambda;
-// trippedMineLambda.addToRolePolicy(dynamoDBAccessStatement);
-// trippedMineLambda.addToRolePolicy(publishToSNSStatement);
-const trippedMineLambdaCfn = trippedMineLambda.node.defaultChild as CfnFunction;
-// trippedMineLambdaCfn.addPropertyOverride(
-//   "Environment.Variables.NOTIFICATION_TOPIC_ARN",
-//   notificationTopic.topicArn
-// );
-// trippedMineLambdaCfn.addPropertyOverride(
-//   "Environment.Variables.APPSYNC_API_ID",
-//   backend.data.apiId
-// );
-// backend.data.addLambdaDataSource(
-//   "trippedMineLambdaDataSource",
-//   trippedMineLambda
-// );
