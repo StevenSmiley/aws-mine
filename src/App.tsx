@@ -1,4 +1,4 @@
-// import * as React from "react";
+import * as React from "react";
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import "@cloudscape-design/global-styles/index.css";
@@ -22,6 +22,7 @@ import {
   Modal,
   SideNavigation,
   SpaceBetween,
+  Pagination,
   Table,
   TopNavigation,
 } from "@cloudscape-design/components";
@@ -40,6 +41,7 @@ function App() {
   const [description, setDescription] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
   const [newMine, setNewMine] = useState<Schema["Mine"]["type"] | null>(null);
+  const [currentPageIndex, setCurrentPageIndex] = React.useState(1);
 
   useEffect(() => {
     client.models.Mine.observeQuery().subscribe({
@@ -268,6 +270,16 @@ function App() {
                   selectedItems={selectedItems}
                   onSelectionChange={({ detail }) =>
                     setSelectedItems(detail.selectedItems)
+                  }
+                  pagination={
+                    <Pagination
+                      currentPageIndex={currentPageIndex}
+                      onChange={({ detail }) => 
+                        setCurrentPageIndex(detail.currentPageIndex)
+                      }
+                      openEnd
+                      pagesCount={3}
+                    />
                   }
                   empty={
                     <Box
