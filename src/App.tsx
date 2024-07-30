@@ -288,7 +288,7 @@ function App() {
                   stickyHeader={true}
                   resizableColumns={true}
                   loadingText="Loading mines"
-                  trackBy={"id"}
+                  trackBy={"accessKeyId"}
                   header={
                     <Header
                       variant="h1"
