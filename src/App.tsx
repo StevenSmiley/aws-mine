@@ -324,7 +324,7 @@ function App() {
                         </SpaceBetween>
                       }
                     >
-                      Mines
+                      Mines ({mines.length})
                     </Header>
                   }
                   // pagination={<Pagination {...paginationProps} />}
