@@ -43,6 +43,7 @@ Copy and paste pairs of AWS access keys anywhere you want to tempt bad guys and 
 
 - [spacesiren](https://github.com/spacesiren/spacesiren)
 - [canarytokens](https://docs.canarytokens.org/guide/aws-keys-token.html)
+- [IMDSpoof](https://github.com/grahamhelton/IMDSpoof)
 
 ## License
 
